@@ -18,6 +18,28 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Architecture Splits for arm64-v8a, armeabi-v7a, x86_64, and Universal APK
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
+    // Assign distinct version codes so 64-bit devices install the optimized 64-bit APK
+    val abiVersionCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86_64" to 3)
+    applicationVariants.all {
+        val variant = this
+        outputs.forEach { output ->
+            val outputImpl = output as? com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val abi = outputImpl?.getFilter(com.android.build.OutputFile.ABI)
+            val abiCode = abiVersionCodes[abi] ?: 0
+            outputImpl?.versionCodeOverride = (variant.versionCode * 10) + abiCode
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

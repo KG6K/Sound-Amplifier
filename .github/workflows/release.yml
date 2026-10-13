@@ -28,16 +28,30 @@ jobs:
       - name: Build Android APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Prepare APK for Release
+      - name: Prepare APKs for Release
         run: |
           mkdir -p release-output
-          cp app/build/outputs/apk/debug/*.apk release-output/SoundAmplifier-v1.0.0.apk
+          for apk in app/build/outputs/apk/debug/*.apk; do
+            filename=$(basename "$apk")
+            if [[ "$filename" == *"universal"* ]]; then
+              cp "$apk" release-output/SoundAmplifier-v1.0.0-universal.apk
+            elif [[ "$filename" == *"arm64-v8a"* ]]; then
+              cp "$apk" release-output/SoundAmplifier-v1.0.0-arm64-v8a.apk
+            elif [[ "$filename" == *"armeabi-v7a"* ]]; then
+              cp "$apk" release-output/SoundAmplifier-v1.0.0-armeabi-v7a.apk
+            elif [[ "$filename" == *"x86_64"* ]]; then
+              cp "$apk" release-output/SoundAmplifier-v1.0.0-x86_64.apk
+            else
+              cp "$apk" "release-output/SoundAmplifier-v1.0.0-${filename}"
+            fi
+          done
+          ls -la release-output/
 
-      - name: Upload APK Artifact
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: SoundAmplifier-APK
-          path: release-output/SoundAmplifier-v1.0.0.apk
+          name: SoundAmplifier-APKs
+          path: release-output/*.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -49,11 +63,20 @@ jobs:
           body: |
             ## Sound Amplifier v1.0.0 Release
 
+            ### Architecture-Optimized APK Downloads:
+            - **`SoundAmplifier-v1.0.0-arm64-v8a.apk`**: Recommended for 95%+ of modern Android phones (64-bit ARM).
+            - **`SoundAmplifier-v1.0.0-universal.apk`**: Guaranteed compatibility across any Android phone or tablet.
+            - **`SoundAmplifier-v1.0.0-armeabi-v7a.apk`**: For older 32-bit Android phones.
+            - **`SoundAmplifier-v1.0.0-x86_64.apk`**: For Android emulators & Chromebooks.
+
+            ### Features:
             - Native Android Kotlin implementation with Jetpack Compose Material 3 UI.
             - Dual sliders: Boost Amplification (+0% to +100%) and System Media Volume.
+            - Real-time Output Spectrum Power visualizer with live frequency response.
             - Background Foreground Service (`mediaPlayback`) with `LoudnessEnhancer`.
-            - Android Quick Settings Tile integration.
+            - Android Quick Settings Tile integration (`VolumeBoosterTileService`).
+            - Built-in crash diagnostics logger to device storage.
             - Compatible with Android 10 (API 29) to Android 15 (API 35).
-          files: release-output/SoundAmplifier-v1.0.0.apk
+          files: release-output/*.apk
           draft: false
           prerelease: false
