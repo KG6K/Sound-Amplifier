@@ -2,22 +2,28 @@ package io.github.kg6k.soundamplifier.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val BackgroundDark = Color(0xFF0A0E17)
-val CardSurfaceDark = Color(0xFF141A28)
-val CardSurfaceVariant = Color(0xFF1B2436)
-val CardBorderDark = Color(0xFF26334D)
+val SurfaceBackground = Color(0xFF141218)
+val SurfaceContainer = Color(0xFF211F26)
+val SurfaceContainerHigh = Color(0xFF2B2930)
+val SurfaceBorder = Color(0xFF33303D)
 
-val PrimaryViolet = Color(0xFF8B5CF6)
-val PrimaryVioletLight = Color(0xFFA78BFA)
-val PrimaryVioletDark = Color(0xFF6D28D9)
+val ThemePrimary = Color(0xFFD0BCFF)
+val ThemeOnPrimary = Color(0xFF381E72)
+val ThemePrimaryContainer = Color(0xFF4F378B)
 
-val AccentEmerald = Color(0xFF10B981)
-val AccentAmber = Color(0xFFF59E0B)
-val AccentRose = Color(0xFFF43F5E)
+val AmberWarning = Color(0xFFF59E0B)
+val AmberGlow = Color(0xFFFFA000)
+val AmberBackground = Color(0xFF3D2A05)
 
-val TrackBackground = Color(0xFF1E283D)
-val TrackActive = Color(0xFF8B5CF6)
+val EmeraldSafe = Color(0xFF34D399)
+val EmeraldBackground = Color(0xFF06331C)
 
-val TextPrimary = Color(0xFFF8FAFC)
-val TextSecondary = Color(0xFF94A3B8)
-val TextMuted = Color(0xFF64748B)
+val RedDanger = Color(0xFFEF4444)
+val RedBackground = Color(0xFF3B1214)
+
+val TrackBackgroundDark = Color(0xFF0F172A)
+val TrackBorder = Color(0xFF1E293B)
+val ThumbWhite = Color(0xFFFFFFFF)
+
+val TextPrimaryWhite = Color(0xFFE3E2E6)
+val TextSecondaryMuted = Color(0xFF938F99)
