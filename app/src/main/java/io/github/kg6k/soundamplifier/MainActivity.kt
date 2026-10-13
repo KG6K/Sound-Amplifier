@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import io.github.kg6k.soundamplifier.data.BoosterPreferences
+import io.github.kg6k.soundamplifier.data.CrashReporter
 import io.github.kg6k.soundamplifier.ui.components.AudioVisualizerWave
 import io.github.kg6k.soundamplifier.ui.components.MaterialExpressiveSlider
 import io.github.kg6k.soundamplifier.ui.components.NotificationShadeCard
@@ -409,6 +410,86 @@ class MainActivity : ComponentActivity() {
                                         fontSize = 11.sp,
                                         color = if (isBoostActive) ThemeOnPrimary.copy(alpha = 0.8f) else TextSecondaryMuted
                                     )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 6. Crash Reports & Storage Diagnostics Card
+                var latestCrashLog by remember { mutableStateOf(CrashReporter.getLatestCrashLog(this@MainActivity)) }
+                val storagePath = remember { CrashReporter.getStorageLocation(this@MainActivity) }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    color = SurfaceContainer,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
+                ) {
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .clip(CircleShape)
+                                        .background(if (latestCrashLog != null) AmberWarning else EmeraldSafe)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Crash Diagnostics & Storage",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextPrimaryWhite
+                                    )
+                                    Text(
+                                        text = if (latestCrashLog != null) "Crash log saved to storage" else "Crash monitoring active (0 crashes)",
+                                        fontSize = 11.sp,
+                                        color = if (latestCrashLog != null) AmberWarning else TextSecondaryMuted
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(
+                            text = "Storage Path:\n$storagePath",
+                            fontSize = 10.sp,
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            color = TextSecondaryMuted,
+                            lineHeight = 14.sp
+                        )
+
+                        if (latestCrashLog != null) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = { CrashReporter.shareLatestCrashLog(this@MainActivity) },
+                                    modifier = Modifier.weight(1f).height(38.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = ThemePrimaryContainer)
+                                ) {
+                                    Text("Share / View Log", fontSize = 12.sp, color = TextPrimaryWhite)
+                                }
+
+                                OutlinedButton(
+                                    onClick = {
+                                        CrashReporter.clearLogs(this@MainActivity)
+                                        latestCrashLog = null
+                                    },
+                                    modifier = Modifier.height(38.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text("Clear", fontSize = 12.sp, color = TextSecondaryMuted)
                                 }
                             }
                         }
