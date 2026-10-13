@@ -4,11 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -23,10 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import io.github.kg6k.soundamplifier.data.BoosterPreferences
 import io.github.kg6k.soundamplifier.ui.components.AudioVisualizerWave
 import io.github.kg6k.soundamplifier.ui.components.BoostSlider
@@ -37,9 +37,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var prefs: BoosterPreferences
     private lateinit var audioManager: AudioManager
 
+    private val boostPercentState = mutableIntStateOf(50)
+    private val isBoostActiveState = mutableStateOf(true)
+
     private val volumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            // Trigger recomposition when system hardware volume buttons are pressed
+            // Re-read preference and volume when system or service updates
+            syncWithPreferences()
         }
     }
 
@@ -48,8 +52,21 @@ class MainActivity : ComponentActivity() {
         prefs = BoosterPreferences(this)
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+        // Match system status bar & navigation bar precisely to app background (#0A0E17)
+        val backgroundColor = Color.parseColor("#0A0E17")
+        window.statusBarColor = backgroundColor
+        window.navigationBarColor = backgroundColor
+
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.isAppearanceLightStatusBars = false
+        insetsController.isAppearanceLightNavigationBars = false
+
+        syncWithPreferences()
+
         try {
-            val filter = IntentFilter("android.media.VOLUME_CHANGED_ACTION")
+            val filter = IntentFilter().apply {
+                addAction("android.media.VOLUME_CHANGED_ACTION")
+            }
             registerReceiver(volumeReceiver, filter)
         } catch (ignored: Throwable) {}
 
@@ -65,6 +82,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        syncWithPreferences()
+    }
+
+    private fun syncWithPreferences() {
+        boostPercentState.intValue = prefs.getBoostPercent()
+        isBoostActiveState.value = prefs.isBoostActive()
+    }
+
     override fun onDestroy() {
         try {
             unregisterReceiver(volumeReceiver)
@@ -75,8 +102,8 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainScreen() {
-        var boostPercent by remember { mutableIntStateOf(prefs.getBoostPercent()) }
-        var isBoostActive by remember { mutableStateOf(prefs.isBoostActive()) }
+        var boostPercent by boostPercentState
+        var isBoostActive by isBoostActiveState
         val maxVolume = remember { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1) }
         var systemVolume by remember {
             mutableIntStateOf(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC))
@@ -218,7 +245,7 @@ class MainActivity : ComponentActivity() {
                         .fillMaxWidth()
                         .height(56.dp)
                         .clip(RoundedCornerShape(18.dp)),
-                    color = Color.Transparent,
+                    color = androidx.compose.ui.graphics.Color.Transparent,
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Button(
@@ -235,7 +262,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .background(buttonBrush),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
+                            containerColor = androidx.compose.ui.graphics.Color.Transparent
                         ),
                         shape = RoundedCornerShape(18.dp)
                     ) {
