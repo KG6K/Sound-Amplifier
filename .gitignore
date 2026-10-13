@@ -32,5 +32,4 @@ local.properties
 .idea/workspace.xml
 *.iml
 
-# Internal AI Studio artifacts
 .aistudio/
