@@ -1,0 +1,59 @@
+name: Build & Release APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build Android APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Prepare APK for Release
+        run: |
+          mkdir -p release-output
+          cp app/build/outputs/apk/debug/*.apk release-output/SoundAmplifier-v1.0.0.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SoundAmplifier-APK
+          path: release-output/SoundAmplifier-v1.0.0.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0.0
+          name: Sound Amplifier v1.0.0
+          body: |
+            ## Sound Amplifier v1.0.0 Release
+
+            - Native Android Kotlin implementation with Jetpack Compose Material 3 UI.
+            - Dual sliders: Boost Amplification (+0% to +100%) and System Media Volume.
+            - Background Foreground Service (`mediaPlayback`) with `LoudnessEnhancer`.
+            - Android Quick Settings Tile integration.
+            - Compatible with Android 10 (API 29) to Android 15 (API 35).
+          files: release-output/SoundAmplifier-v1.0.0.apk
+          draft: false
+          prerelease: false
