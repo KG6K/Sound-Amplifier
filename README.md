@@ -35,6 +35,5 @@ A lightweight Android volume booster and audio loudness amplifier built with Mat
 ├── .editorconfig            # Code style formatting
 ├── .gitattributes           # Git line-ending configuration
 ├── CONTRIBUTING.md          # Contribution guidelines
-├── AGENTS.md                # AI agent instructions
-└── LICENSE                  # Apache 2.0 license
+└── AGENTS.md                # AI agent instructions
 ```
