@@ -1,17 +1,17 @@
 package io.github.kg6k.soundamplifier
 
-import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import androidx.core.content.ContextCompat
+import android.util.Log
 
 /**
- * Android Quick Settings TileService for Sound Amplifier
- * Tested for Android 10 (API 29) through Android 15 (API 35)
+ * Crash-safe Android Quick Settings TileService
  */
 class VolumeBoosterTileService : TileService() {
+
+    private val TAG = "VolumeBoosterTile"
 
     override fun onStartListening() {
         super.onStartListening()
@@ -20,48 +20,51 @@ class VolumeBoosterTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
-        val tile = qsTile ?: return
+        try {
+            val prefs = getSharedPreferences("sound_amplifier_prefs", MODE_PRIVATE)
+            val isCurrentlyActive = prefs.getBoolean("is_boost_active", false)
+            val boostPercent = prefs.getInt("boost_percent", 50)
+            val newActiveState = !isCurrentlyActive
 
-        val isCurrentlyActive = (tile.state == Tile.STATE_ACTIVE)
-        val newActiveState = !isCurrentlyActive
+            prefs.edit().putBoolean("is_boost_active", newActiveState).apply()
 
-        val serviceIntent = Intent(this, VolumeBoosterService::class.java).apply {
-            action = if (newActiveState) {
-                VolumeBoosterService.ACTION_ENABLE_BOOST
+            if (newActiveState) {
+                VolumeBoosterService.startService(this, boostPercent)
             } else {
-                VolumeBoosterService.ACTION_DISABLE_BOOST
+                VolumeBoosterService.stopService(this)
             }
+
+            updateTileState()
+        } catch (t: Throwable) {
+            Log.e(TAG, "Error in tile onClick: ${t.message}", t)
         }
-        ContextCompat.startForegroundService(this, serviceIntent)
-
-        val prefs = getSharedPreferences("sound_amplifier_prefs", MODE_PRIVATE)
-        prefs.edit().putBoolean("is_boost_active", newActiveState).apply()
-
-        updateTileState()
     }
 
     private fun updateTileState() {
-        val tile = qsTile ?: return
-        val prefs = getSharedPreferences("sound_amplifier_prefs", MODE_PRIVATE)
-        val isActive = prefs.getBoolean("is_boost_active", false)
-        val boostPercent = prefs.getInt("boost_percent", 50)
+        try {
+            val tile = qsTile ?: return
+            val prefs = getSharedPreferences("sound_amplifier_prefs", MODE_PRIVATE)
+            val isActive = prefs.getBoolean("is_boost_active", false)
+            val boostPercent = prefs.getInt("boost_percent", 50)
 
-        if (isActive) {
-            tile.state = Tile.STATE_ACTIVE
-            tile.label = getString(R.string.tile_label)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                tile.subtitle = "+$boostPercent% Boost"
+            if (isActive) {
+                tile.state = Tile.STATE_ACTIVE
+                tile.label = getString(R.string.tile_label)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    tile.subtitle = "+$boostPercent% Boost"
+                }
+            } else {
+                tile.state = Tile.STATE_INACTIVE
+                tile.label = getString(R.string.tile_label)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    tile.subtitle = "Off"
+                }
             }
+
             tile.icon = Icon.createWithResource(this, R.drawable.ic_qs_volume_boost)
-        } else {
-            tile.state = Tile.STATE_INACTIVE
-            tile.label = getString(R.string.tile_label)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                tile.subtitle = "Off"
-            }
-            tile.icon = Icon.createWithResource(this, R.drawable.ic_qs_volume_boost)
+            tile.updateTile()
+        } catch (t: Throwable) {
+            Log.e(TAG, "Error updating tile: ${t.message}", t)
         }
-
-        tile.updateTile()
     }
 }
