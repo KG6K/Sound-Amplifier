@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production build outputs
+dist/
+build/
+coverage/
+
+# Environment
+.env*
+!.env.example
+
+# Logs & System
+*.log
+.DS_Store
+Thumbs.db
+
+# Android build outputs & local config
+.gradle/
+app/build/
+local.properties
+*.apk
+*.aab
+.cxx/
+
+# IDE files
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+*.iml
+
+# Internal AI Studio artifacts
+.aistudio/

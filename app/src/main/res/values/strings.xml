@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Sound Amplifier</string>
+    <string name="tile_label">Sound Amplifier</string>
+    <string name="channel_name">Sound Amplifier Service</string>
+</resources>

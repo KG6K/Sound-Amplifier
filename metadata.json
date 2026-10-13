@@ -1,0 +1,6 @@
+{
+  "name": "SoundSurge - Material 3 Volume Booster",
+  "description": "Sound Amplifier app featuring expressive sliders, background audio amplification, safety limiter, and Quick Settings tile support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
