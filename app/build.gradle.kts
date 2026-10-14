@@ -12,8 +12,8 @@ android {
         applicationId = "io.github.kg6k.soundamplifier"
         minSdk = 29 // Android 10.0 (API 29) and above
         targetSdk = 35 // Android 15 (API 35)
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.0-alpha1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,18 +25,6 @@ android {
             reset()
             include("arm64-v8a", "armeabi-v7a", "x86_64")
             isUniversalApk = true
-        }
-    }
-
-    // Assign distinct version codes so 64-bit devices install the optimized 64-bit APK
-    val abiVersionCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86_64" to 3)
-    applicationVariants.all {
-        val variant = this
-        outputs.forEach { output ->
-            val outputImpl = output as? com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            val abi = outputImpl?.getFilter(com.android.build.OutputFile.ABI)
-            val abiCode = abiVersionCodes[abi] ?: 0
-            outputImpl?.versionCodeOverride = (variant.versionCode * 10) + abiCode
         }
     }
 

@@ -60,7 +60,7 @@ object CrashReporter {
             appendLine("==========================================")
             appendLine("Timestamp       : $readableDate")
             appendLine("Package         : ${context.packageName}")
-            appendLine("App Version     : 1.0.0 (1)")
+            appendLine("App Version     : 1.0.0-alpha1 (2)")
             appendLine("Device Model    : ${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE})")
             appendLine("Android Version : Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
             appendLine("Fingerprint     : ${Build.FINGERPRINT}")
