@@ -18,8 +18,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -175,16 +179,44 @@ class MainActivity : ComponentActivity() {
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Canvas(modifier = Modifier.size(18.dp)) {
-                                    val path = Path().apply {
-                                        moveTo(size.width * 0.55f, 0f)
-                                        lineTo(size.width * 0.1f, size.height * 0.55f)
-                                        lineTo(size.width * 0.5f, size.height * 0.55f)
-                                        lineTo(size.width * 0.45f, size.height)
-                                        lineTo(size.width * 0.9f, size.height * 0.45f)
-                                        lineTo(size.width * 0.5f, size.height * 0.45f)
+                                    val w = size.width
+                                    val h = size.height
+                                    val strokeWidth = 1.75.dp.toPx()
+                                    val iconColor = MaterialTheme.colorScheme.onPrimary
+
+                                    // Speaker horn body
+                                    val speakerPath = Path().apply {
+                                        moveTo(w * 0.12f, h * 0.35f)
+                                        lineTo(w * 0.32f, h * 0.35f)
+                                        lineTo(w * 0.58f, h * 0.15f)
+                                        lineTo(w * 0.58f, h * 0.85f)
+                                        lineTo(w * 0.32f, h * 0.65f)
+                                        lineTo(w * 0.12f, h * 0.65f)
                                         close()
                                     }
-                                    drawPath(path, color = MaterialTheme.colorScheme.onPrimary)
+                                    drawPath(speakerPath, color = iconColor)
+
+                                    // Inner sound wave arc
+                                    drawArc(
+                                        color = iconColor,
+                                        startAngle = -45f,
+                                        sweepAngle = 90f,
+                                        useCenter = false,
+                                        topLeft = Offset(w * 0.44f, h * 0.28f),
+                                        size = Size(w * 0.30f, h * 0.44f),
+                                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                                    )
+
+                                    // Outer sound wave arc
+                                    drawArc(
+                                        color = iconColor,
+                                        startAngle = -45f,
+                                        sweepAngle = 90f,
+                                        useCenter = false,
+                                        topLeft = Offset(w * 0.52f, h * 0.16f),
+                                        size = Size(w * 0.42f, h * 0.68f),
+                                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                                    )
                                 }
                             }
                         }

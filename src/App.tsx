@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Zap } from 'lucide-react';
+import { Volume2 } from 'lucide-react';
 import { audioEngine } from './utils/audioEngine';
 import { MaterialSlider } from './components/MaterialSlider';
 
@@ -66,7 +66,7 @@ export default function App() {
                 color: iconColor,
               }}
             >
-              <Zap size={20} className={isBoostActive ? 'fill-current' : ''} />
+              <Volume2 size={20} className={isBoostActive ? 'fill-current' : ''} />
             </div>
             <div>
               <h1
