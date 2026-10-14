@@ -101,14 +101,12 @@ export default function App() {
           isBoostMode={true}
           enabled={true}
           isDark={isDark}
-          ticks={[0, 20, 40, 60, 80, 100]}
           onChange={handleBoostChange}
         />
 
         {/* 2. System Media Volume Line Slider */}
         <MaterialSlider
           label="System Media Volume"
-          sublabel="Standard device audio stream level (0% to 100%)"
           value={systemVolume}
           min={0}
           max={100}
@@ -117,7 +115,6 @@ export default function App() {
           isBoostMode={false}
           enabled={true}
           isDark={isDark}
-          ticks={[0, 20, 40, 60, 80, 100]}
           onChange={handleSystemVolumeChange}
         />
       </div>

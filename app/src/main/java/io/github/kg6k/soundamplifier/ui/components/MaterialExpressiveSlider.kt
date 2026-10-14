@@ -35,7 +35,7 @@ fun MaterialExpressiveSlider(
     value: Int,
     onValueChange: (Int) -> Unit,
     label: String,
-    sublabel: String,
+    sublabel: String = "",
     modifier: Modifier = Modifier,
     min: Int = 0,
     max: Int = 100,
@@ -44,7 +44,7 @@ fun MaterialExpressiveSlider(
     enabled: Boolean = true,
     prefix: String = if (isBoostMode) "+" else "",
     unit: String = "%",
-    presets: List<Int> = listOf(0, 20, 40, 60, 80, 100)
+    presets: List<Int> = emptyList()
 ) {
     val isDark = isSystemInDarkTheme()
     val colorScheme = MaterialTheme.colorScheme
@@ -166,15 +166,18 @@ fun MaterialExpressiveSlider(
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = sublabel,
-                fontSize = 12.sp,
-                color = colorScheme.onSurfaceVariant,
-                lineHeight = 16.sp
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
+            if (sublabel.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = sublabel,
+                    fontSize = 12.sp,
+                    color = colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+                Spacer(modifier = Modifier.height(18.dp))
+            } else {
+                Spacer(modifier = Modifier.height(14.dp))
+            }
 
             // Sleek Modern Line Slider Track & Round Thumb
             BoxWithConstraints(
@@ -242,7 +245,7 @@ fun MaterialExpressiveSlider(
             }
 
             // Quick Preset Chips (e.g. 0%, 20%, 40%, 60%, 80%, 100%)
-            if (isBoostMode) {
+            if (isBoostMode && presets.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

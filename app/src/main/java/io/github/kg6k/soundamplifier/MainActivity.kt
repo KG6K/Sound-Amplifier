@@ -234,8 +234,7 @@ class MainActivity : ComponentActivity() {
                     label = "Boost Amplification",
                     sublabel = "Amplifies audio volume past standard 100% Android speaker ceiling",
                     isBoostMode = true,
-                    enabled = true,
-                    presets = listOf(0, 20, 40, 60, 80, 100)
+                    enabled = true
                 )
 
                 // 2. Standard System Media Volume Line Slider
@@ -248,7 +247,7 @@ class MainActivity : ComponentActivity() {
                         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVol, 0)
                     },
                     label = "System Media Volume",
-                    sublabel = "Standard device audio stream level (0% to 100%)",
+                    sublabel = "",
                     isBoostMode = false,
                     enabled = true,
                     prefix = "",

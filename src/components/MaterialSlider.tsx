@@ -32,7 +32,7 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
   enabled = true,
   isDark = true,
   onChange,
-  ticks = [0, 20, 40, 60, 80, 100],
+  ticks = [],
   onDangerousThreshold,
 }) => {
   const isDisabled = disabled || !enabled;
@@ -154,7 +154,7 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
       }}
     >
       {/* Header Info: Label, Status Pill, and Value Pill */}
-      <div className="flex items-center justify-between mb-1">
+      <div className={`flex items-center justify-between ${sublabel ? 'mb-1' : 'mb-3'}`}>
         <div className="flex items-center gap-2 min-w-0 pr-2">
           <span
             className="text-base font-bold tracking-tight whitespace-nowrap"
@@ -188,9 +188,11 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
         </div>
       </div>
 
-      <p className="text-xs mb-5 line-clamp-1" style={{ color: textSub }}>
-        {sublabel}
-      </p>
+      {sublabel && (
+        <p className="text-xs mb-4 line-clamp-1" style={{ color: textSub }}>
+          {sublabel}
+        </p>
+      )}
 
       {/* Sleek Line Slider Track */}
       <div className="relative py-2 select-none">
@@ -224,36 +226,6 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
             }}
           />
         </div>
-
-        {/* Quick Presets (e.g. 0%, 20%, 40%, 60%, 80%, 100%) */}
-        {isBoostMode && ticks.length > 0 && (
-          <div className="grid grid-cols-6 gap-1.5 mt-2">
-            {ticks.map((tick) => {
-              const isSelected = value === tick;
-              const chipInactiveBg = isDark ? '#1E212B' : '#F1F5F9';
-              const chipInactiveBorder = isDark ? '#2C3242' : '#CBD5E1';
-              const chipInactiveText = isDark ? '#938F99' : '#64748B';
-
-              return (
-                <button
-                  key={tick}
-                  type="button"
-                  onClick={() => onChange(tick)}
-                  className="py-1.5 rounded-lg text-xs font-mono font-medium transition-all border"
-                  style={{
-                    backgroundColor: isSelected ? `${trackColor}25` : chipInactiveBg,
-                    borderColor: isSelected ? trackColor : chipInactiveBorder,
-                    color: isSelected ? trackColor : chipInactiveText,
-                    fontWeight: isSelected ? '700' : '500',
-                  }}
-                >
-                  {prefix}
-                  {tick}%
-                </button>
-              );
-            })}
-          </div>
-        )}
       </div>
     </div>
   );
