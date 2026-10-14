@@ -63,11 +63,11 @@ fun MaterialExpressiveSlider(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         color = colorScheme.surface,
         border = androidx.compose.foundation.BorderStroke(1.dp, colorScheme.outline)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
             // Header Row: Label and Tabular Value Display
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -77,58 +77,58 @@ fun MaterialExpressiveSlider(
                 // Label
                 Text(
                     text = label,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
                     color = colorScheme.onSurface,
                     modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
                 )
 
-                // Tabular Value Display (+50%)
+                // Compact Value Display (+50%)
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(8.dp),
                     color = trackColor.copy(alpha = 0.15f),
                     border = androidx.compose.foundation.BorderStroke(1.dp, trackColor.copy(alpha = 0.4f))
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
                             text = "$prefix$value",
-                            fontSize = 20.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace,
                             color = trackColor
                         )
                         Text(
                             text = unit,
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = trackColor,
-                            modifier = Modifier.padding(bottom = 2.dp, start = 1.dp)
+                            modifier = Modifier.padding(bottom = 1.dp, start = 1.dp)
                         )
                     }
                 }
             }
 
             if (sublabel.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = sublabel,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = colorScheme.onSurfaceVariant,
-                    lineHeight = 16.sp
+                    lineHeight = 14.sp
                 )
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(10.dp))
             } else {
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             // Sleek Modern Line Slider Track & Round Thumb
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(36.dp)
+                    .height(28.dp)
                     .pointerInput(enabled) {
                         if (!enabled) return@pointerInput
                         detectTapGestures { offset ->
@@ -174,18 +174,18 @@ fun MaterialExpressiveSlider(
                     )
                 }
 
-                // 3. Smooth Circular Elevated Thumb (22dp diameter)
-                val thumbSize = 22.dp
+                // 3. Smooth Circular Elevated Thumb (18dp diameter)
+                val thumbSize = 18.dp
                 val thumbOffset = ((maxWidth - thumbSize) * fraction).coerceAtLeast(0.dp)
 
                 Box(
                     modifier = Modifier
                         .offset(x = thumbOffset)
                         .size(thumbSize)
-                        .shadow(elevation = 6.dp, shape = CircleShape)
+                        .shadow(elevation = 3.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(Color.White)
-                        .border(3.dp, trackColor, CircleShape)
+                        .border(2.5.dp, trackColor, CircleShape)
                 )
             }
 

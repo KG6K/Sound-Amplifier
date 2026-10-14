@@ -55,7 +55,7 @@ export default function App() {
       className="min-h-screen w-full flex flex-col items-center justify-start p-4 sm:p-6 transition-colors duration-300 font-sans select-none"
       style={{ backgroundColor: bgColor }}
     >
-      <div className="w-full max-w-md space-y-4">
+      <div className="w-full max-w-md space-y-3">
         {/* App Header Bar - Exact Match to Native Kotlin MainActivity (No Version Badge, No Switches) */}
         <div className="flex items-center justify-between py-2 px-1">
           <div className="flex items-center gap-3">

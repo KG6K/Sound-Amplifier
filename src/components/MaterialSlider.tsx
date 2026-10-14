@@ -124,7 +124,7 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
 
   return (
     <div
-      className={`w-full p-5 rounded-3xl transition-all ${
+      className={`w-full px-4 py-3.5 rounded-2xl transition-all ${
         isDisabled ? 'opacity-40 pointer-events-none' : ''
       }`}
       style={{
@@ -134,46 +134,46 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
       }}
     >
       {/* Header Info: Label and Value Pill */}
-      <div className={`flex items-center justify-between ${sublabel ? 'mb-1' : 'mb-3'}`}>
+      <div className={`flex items-center justify-between ${sublabel ? 'mb-0.5' : 'mb-2'}`}>
         <div className="flex items-center gap-2 min-w-0 pr-2">
           <span
-            className="text-base font-bold tracking-tight whitespace-nowrap"
+            className="text-sm font-semibold tracking-tight whitespace-nowrap"
             style={{ color: textTitle }}
           >
             {label}
           </span>
         </div>
 
-        {/* Tabular Value Display */}
+        {/* Compact Value Display */}
         <div
-          className="px-2.5 py-1 rounded-xl flex items-baseline font-mono border"
+          className="px-2 py-0.5 rounded-lg flex items-baseline font-mono border"
           style={{
             backgroundColor: `${trackColor}18`,
             borderColor: `${trackColor}40`,
             color: trackColor,
           }}
         >
-          <span className="text-lg font-bold">
+          <span className="text-sm font-bold">
             {prefix}
             {value}
           </span>
-          <span className="text-xs font-bold ml-0.5">{unit}</span>
+          <span className="text-[10px] font-bold ml-0.5">{unit}</span>
         </div>
       </div>
 
       {sublabel && (
-        <p className="text-xs mb-4 line-clamp-1" style={{ color: textSub }}>
+        <p className="text-[11px] mb-2 leading-tight line-clamp-1" style={{ color: textSub }}>
           {sublabel}
         </p>
       )}
 
-      {/* Sleek Line Slider Track */}
-      <div className="relative py-2 select-none">
+      {/* Compact Line Slider Track */}
+      <div className="relative py-1 select-none">
         <div
           ref={trackRef}
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
-          className="relative w-full h-8 flex items-center cursor-pointer touch-none"
+          className="relative w-full h-6 flex items-center cursor-pointer touch-none"
         >
           {/* Inactive Track Line */}
           <div
@@ -192,10 +192,10 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
 
           {/* Smooth Circular Elevated Thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white shadow-md cursor-grab active:cursor-grabbing active:scale-110 transition-transform"
+            className="absolute top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-full bg-white shadow-sm cursor-grab active:cursor-grabbing active:scale-110 transition-transform"
             style={{
-              left: `calc(${percent}% - 10px)`,
-              border: `3px solid ${trackColor}`,
+              left: `calc(${percent}% - 9px)`,
+              border: `2.5px solid ${trackColor}`,
             }}
           />
         </div>

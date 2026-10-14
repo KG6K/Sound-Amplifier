@@ -216,7 +216,7 @@ class MainActivity : ComponentActivity() {
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // 1. PRIMARY: Boost Amplification Modern Line Slider
                 // Zero switches: Slider directly drives the audio booster (0% = off, >0% = active)
