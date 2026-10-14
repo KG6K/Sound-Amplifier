@@ -41,13 +41,3 @@ val RedBackgroundLight = Color(0xFFFEE2E2)
 val TrackBackgroundDark = Color(0xFF2D2A35)
 val TrackBackgroundLight = Color(0xFFE2E8F0)
 val ThumbWhite = Color(0xFFFFFFFF)
-
-// Legacy Aliases
-val SurfaceBackground = SurfaceBackgroundDark
-val SurfaceContainer = SurfaceContainerDark
-val SurfaceBorder = SurfaceBorderDark
-val ThemePrimary = ThemePrimaryDark
-val ThemeOnPrimary = ThemeOnPrimaryDark
-val ThemePrimaryContainer = ThemePrimaryContainerDark
-val TextPrimaryWhite = TextPrimaryDark
-val TextSecondaryMuted = TextSecondaryDark

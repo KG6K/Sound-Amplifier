@@ -92,17 +92,7 @@ export class AudioEngine {
     this.updateLimiterRouting();
   }
 
-  public getVisualizerData(buffer: Uint8Array): void {
-    if (this.analyser) {
-      this.analyser.getByteFrequencyData(buffer as unknown as Uint8Array<ArrayBuffer>);
-    } else {
-      buffer.fill(0);
-    }
-  }
 
-  public getCompressionReduction(): number {
-    return this.compressor ? this.compressor.reduction : 0;
-  }
 }
 
 export const audioEngine = new AudioEngine();
