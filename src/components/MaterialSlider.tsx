@@ -45,36 +45,16 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
   // Dynamic theme colors
   const primaryColor = isDark ? '#D0BCFF' : '#6750A4';
   let trackColor = primaryColor;
-  let statusBadge = 'Normal';
-  let statusBadgeStyle = isDark
-    ? 'text-slate-400 bg-slate-800/80 border-slate-700/60'
-    : 'text-slate-600 bg-slate-100 border-slate-300';
 
   if (isBoostMode) {
     if (value === 0) {
       trackColor = isDark ? '#64748b' : '#94a3b8';
-      statusBadge = 'Off';
-      statusBadgeStyle = isDark
-        ? 'text-slate-400 bg-slate-800/70 border-slate-700/60'
-        : 'text-slate-500 bg-slate-100 border-slate-300';
     } else if (value <= 30) {
       trackColor = '#10b981';
-      statusBadge = 'Safe Boost';
-      statusBadgeStyle = isDark
-        ? 'text-emerald-300 bg-emerald-950/80 border-emerald-800/60'
-        : 'text-emerald-700 bg-emerald-50 border-emerald-300';
     } else if (value <= 60) {
       trackColor = '#f59e0b';
-      statusBadge = 'High Volume';
-      statusBadgeStyle = isDark
-        ? 'text-amber-300 bg-amber-950/80 border-amber-800/60'
-        : 'text-amber-700 bg-amber-50 border-amber-300';
     } else {
       trackColor = '#ef4444';
-      statusBadge = 'Max Boost';
-      statusBadgeStyle = isDark
-        ? 'text-red-300 bg-red-950/80 border-red-800/60'
-        : 'text-red-700 bg-red-50 border-red-300';
     }
   }
 
@@ -153,7 +133,7 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
         boxShadow: isDark ? 'none' : '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
       }}
     >
-      {/* Header Info: Label, Status Pill, and Value Pill */}
+      {/* Header Info: Label and Value Pill */}
       <div className={`flex items-center justify-between ${sublabel ? 'mb-1' : 'mb-3'}`}>
         <div className="flex items-center gap-2 min-w-0 pr-2">
           <span
@@ -162,13 +142,6 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
           >
             {label}
           </span>
-          {isBoostMode && (
-            <span
-              className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border whitespace-nowrap ${statusBadgeStyle}`}
-            >
-              {statusBadge}
-            </span>
-          )}
         </div>
 
         {/* Tabular Value Display */}

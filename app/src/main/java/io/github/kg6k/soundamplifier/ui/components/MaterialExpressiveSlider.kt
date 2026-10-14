@@ -61,39 +61,6 @@ fun MaterialExpressiveSlider(
         label = "track_color"
     )
 
-    val (badgeText, badgeBg, badgeTextColor, badgeBorder) = when {
-        value == 0 -> Quad(
-            "Off",
-            if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
-            if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B),
-            if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1)
-        )
-        isBoostMode && value <= 30 -> Quad(
-            "Safe Boost",
-            if (isDark) EmeraldBackground else EmeraldBackgroundLight,
-            EmeraldSafe,
-            EmeraldSafe.copy(alpha = 0.4f)
-        )
-        isBoostMode && value <= 60 -> Quad(
-            "High Volume",
-            if (isDark) AmberBackground else AmberBackgroundLight,
-            AmberWarning,
-            AmberWarning.copy(alpha = 0.4f)
-        )
-        isBoostMode -> Quad(
-            "Max Boost",
-            if (isDark) RedBackground else RedBackgroundLight,
-            RedDanger,
-            RedDanger.copy(alpha = 0.4f)
-        )
-        else -> Quad(
-            "Normal",
-            if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
-            colorScheme.primary,
-            colorScheme.primary.copy(alpha = 0.4f)
-        )
-    }
-
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -101,42 +68,20 @@ fun MaterialExpressiveSlider(
         border = androidx.compose.foundation.BorderStroke(1.dp, colorScheme.outline)
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
-            // Header Row: Label, Status Pill Badge, and Tabular Value Display
+            // Header Row: Label and Tabular Value Display
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Label + Horizontal Badge (strictly horizontal, no wrapping)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                // Label
+                Text(
+                    text = label,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.onSurface,
                     modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
-                ) {
-                    Text(
-                        text = label,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colorScheme.onSurface
-                    )
-
-                    if (isBoostMode) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = badgeBg,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, badgeBorder)
-                        ) {
-                            Text(
-                                text = badgeText,
-                                maxLines = 1,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = badgeTextColor
-                            )
-                        }
-                    }
-                }
+                )
 
                 // Tabular Value Display (+50%)
                 Surface(
@@ -285,5 +230,3 @@ fun MaterialExpressiveSlider(
         }
     }
 }
-
-private data class Quad<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
