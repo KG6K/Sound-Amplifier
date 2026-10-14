@@ -8,32 +8,25 @@ import android.media.AudioManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import io.github.kg6k.soundamplifier.data.BoosterPreferences
 import io.github.kg6k.soundamplifier.data.CrashReporter
-import io.github.kg6k.soundamplifier.ui.components.AudioVisualizerWave
 import io.github.kg6k.soundamplifier.ui.components.MaterialExpressiveSlider
-import io.github.kg6k.soundamplifier.ui.components.NotificationShadeCard
 import io.github.kg6k.soundamplifier.ui.theme.*
 
 class MainActivity : ComponentActivity() {
@@ -41,8 +34,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var prefs: BoosterPreferences
     private lateinit var audioManager: AudioManager
 
-    private val boostPercentState = mutableIntStateOf(50)
-    private val isBoostActiveState = mutableStateOf(true)
+    private val boostPercentState = mutableIntStateOf(0)
 
     private val volumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -55,15 +47,6 @@ class MainActivity : ComponentActivity() {
         prefs = BoosterPreferences(this)
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        // Match system status bar precisely to #141218
-        val bgColor = android.graphics.Color.parseColor("#141218")
-        window.statusBarColor = bgColor
-        window.navigationBarColor = bgColor
-
-        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-        insetsController.isAppearanceLightStatusBars = false
-        insetsController.isAppearanceLightNavigationBars = false
-
         syncWithPreferences()
 
         try {
@@ -73,9 +56,24 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SoundAmplifierTheme {
+                val isDark = isSystemInDarkTheme()
+                SideEffect {
+                    val bgColor = if (isDark) {
+                        android.graphics.Color.parseColor("#141218")
+                    } else {
+                        android.graphics.Color.parseColor("#F8F9FA")
+                    }
+                    window.statusBarColor = bgColor
+                    window.navigationBarColor = bgColor
+
+                    val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+                    insetsController.isAppearanceLightStatusBars = !isDark
+                    insetsController.isAppearanceLightNavigationBars = !isDark
+                }
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = SurfaceBackground
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     MainScreen()
                 }
@@ -90,7 +88,6 @@ class MainActivity : ComponentActivity() {
 
     private fun syncWithPreferences() {
         boostPercentState.intValue = prefs.getBoostPercent()
-        isBoostActiveState.value = prefs.isBoostActive()
     }
 
     override fun onDestroy() {
@@ -100,116 +97,114 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainScreen() {
         var boostPercent by boostPercentState
-        var isBoostActive by isBoostActiveState
         val maxVolume = remember { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1) }
         var systemVolume by remember {
             mutableIntStateOf(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC))
         }
 
+        // Automatic Crash Recovery Dialog (no permanent UI clutter)
+        var showCrashDialog by remember {
+            mutableStateOf(CrashReporter.getLatestCrashLog(this@MainActivity) != null)
+        }
+
+        if (showCrashDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    CrashReporter.clearLogs(this@MainActivity)
+                    showCrashDialog = false
+                },
+                title = {
+                    Text(
+                        text = "Crash Report Saved",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Sound Amplifier detected an unexpected error and saved the diagnostic report to storage.\n\nPath: ${CrashReporter.getStorageLocation(this@MainActivity)}\n\nWould you like to share or export this report?",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            CrashReporter.shareLatestCrashLog(this@MainActivity)
+                            CrashReporter.clearLogs(this@MainActivity)
+                            showCrashDialog = false
+                        }
+                    ) {
+                        Text("Share / Save")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            CrashReporter.clearLogs(this@MainActivity)
+                            showCrashDialog = false
+                        }
+                    ) {
+                        Text("Dismiss")
+                    }
+                }
+            )
+        }
+
         Scaffold(
-            containerColor = SurfaceBackground,
+            containerColor = MaterialTheme.colorScheme.background,
             topBar = {
-                // Header Bar matching Screenshot_20261014-010845.jpg
+                // Header Bar: Sleek, Adaptive, Zero switches
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = SurfaceBackground
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 14.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                            .padding(horizontal = 20.dp, vertical = 18.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Left: Circular purple icon with lightning bolt + Title
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Surface(
-                                modifier = Modifier.size(42.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                color = if (isBoostActive) ThemePrimary else Color(0xFF2A2830)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Canvas(modifier = Modifier.size(20.dp)) {
-                                        val path = Path().apply {
-                                            moveTo(size.width * 0.55f, 0f)
-                                            lineTo(size.width * 0.1f, size.height * 0.55f)
-                                            lineTo(size.width * 0.5f, size.height * 0.55f)
-                                            lineTo(size.width * 0.45f, size.height)
-                                            lineTo(size.width * 0.9f, size.height * 0.45f)
-                                            lineTo(size.width * 0.5f, size.height * 0.45f)
-                                            close()
-                                        }
-                                        drawPath(
-                                            path,
-                                            color = if (isBoostActive) ThemeOnPrimary else Color(0xFF999999)
-                                        )
+                        Surface(
+                            modifier = Modifier.size(38.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Canvas(modifier = Modifier.size(18.dp)) {
+                                    val path = Path().apply {
+                                        moveTo(size.width * 0.55f, 0f)
+                                        lineTo(size.width * 0.1f, size.height * 0.55f)
+                                        lineTo(size.width * 0.5f, size.height * 0.55f)
+                                        lineTo(size.width * 0.45f, size.height)
+                                        lineTo(size.width * 0.9f, size.height * 0.45f)
+                                        lineTo(size.width * 0.5f, size.height * 0.45f)
+                                        close()
                                     }
+                                    drawPath(path, color = MaterialTheme.colorScheme.onPrimary)
                                 }
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
                             Text(
                                 text = "Sound Amplifier",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimaryWhite
+                                color = MaterialTheme.colorScheme.onBackground
                             )
-                        }
-
-                        // Right: Master Volume/Mute button with purple border
-                        Surface(
-                            modifier = Modifier
-                                .size(42.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .clickable {
-                                    isBoostActive = !isBoostActive
-                                    prefs.setBoostActive(isBoostActive)
-                                    if (isBoostActive) {
-                                        VolumeBoosterService.startService(this@MainActivity, boostPercent)
-                                    } else {
-                                        VolumeBoosterService.stopService(this@MainActivity)
-                                    }
+                            Text(
+                                text = if (boostPercent > 0) {
+                                    "Amplification active (+${(boostPercent * 40) / 100} dB)"
+                                } else {
+                                    "Amplification idle (0%)"
                                 },
-                            shape = RoundedCornerShape(16.dp),
-                            color = if (isBoostActive) Color(0xFF2E2248) else Color(0xFF1E1D24),
-                            border = androidx.compose.foundation.BorderStroke(
-                                1.5.dp,
-                                if (isBoostActive) ThemePrimary.copy(alpha = 0.8f) else SurfaceBorder
+                                fontSize = 11.sp,
+                                color = if (boostPercent > 0) AmberWarning else MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                // Speaker Icon
-                                Canvas(modifier = Modifier.size(20.dp)) {
-                                    val iconColor = if (isBoostActive) ThemePrimary else Color(0xFF64748B)
-                                    // Speaker body
-                                    val body = Path().apply {
-                                        moveTo(size.width * 0.1f, size.height * 0.35f)
-                                        lineTo(size.width * 0.35f, size.height * 0.35f)
-                                        lineTo(size.width * 0.6f, size.height * 0.15f)
-                                        lineTo(size.width * 0.6f, size.height * 0.85f)
-                                        lineTo(size.width * 0.35f, size.height * 0.65f)
-                                        lineTo(size.width * 0.1f, size.height * 0.65f)
-                                        close()
-                                    }
-                                    drawPath(body, color = iconColor)
-
-                                    if (isBoostActive) {
-                                        // Sound wave arc
-                                        drawArc(
-                                            color = iconColor,
-                                            startAngle = -45f,
-                                            sweepAngle = 90f,
-                                            useCenter = false,
-                                            topLeft = Offset(size.width * 0.4f, size.height * 0.25f),
-                                            size = androidx.compose.ui.geometry.Size(size.width * 0.5f, size.height * 0.5f),
-                                            style = Stroke(width = 2.dp.toPx())
-                                        )
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -223,61 +218,27 @@ class MainActivity : ComponentActivity() {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // 1. Android Notification Shade Card (Top Card in Screenshot)
-                NotificationShadeCard(
-                    boostPercent = boostPercent,
-                    isActive = isBoostActive,
-                    onToggleBoost = {
-                        isBoostActive = !isBoostActive
-                        prefs.setBoostActive(isBoostActive)
-                        if (isBoostActive) {
-                            VolumeBoosterService.startService(this@MainActivity, boostPercent)
+                // 1. PRIMARY: Boost Amplification Modern Line Slider
+                // Zero switches: Slider directly drives the audio booster (0% = off, >0% = active)
+                MaterialExpressiveSlider(
+                    value = boostPercent,
+                    onValueChange = { newPercent ->
+                        boostPercent = newPercent
+                        prefs.setBoostPercent(newPercent)
+                        if (newPercent > 0) {
+                            VolumeBoosterService.setBoost(this@MainActivity, newPercent)
                         } else {
                             VolumeBoosterService.stopService(this@MainActivity)
                         }
                     },
-                    onQuickAdd = { amount ->
-                        val next = (boostPercent + amount).coerceIn(0, 100)
-                        boostPercent = next
-                        prefs.setBoostPercent(next)
-                        if (isBoostActive) {
-                            VolumeBoosterService.updatePercent(this@MainActivity, next)
-                        }
-                    },
-                    onStopService = {
-                        isBoostActive = false
-                        prefs.setBoostActive(false)
-                        VolumeBoosterService.stopService(this@MainActivity)
-                    }
-                )
-
-                // 2. Real-time Dynamic Output Spectrum Power (Waveform Box)
-                AudioVisualizerWave(
-                    boostPercent = boostPercent,
-                    isActive = isBoostActive
-                )
-
-                // 3. PRIMARY: Expressive Boost Percentage Slider
-                MaterialExpressiveSlider(
-                    value = if (isBoostActive) boostPercent else 0,
-                    onValueChange = { newPercent ->
-                        boostPercent = newPercent
-                        prefs.setBoostPercent(newPercent)
-                        if (newPercent > 0 && !isBoostActive) {
-                            isBoostActive = true
-                            prefs.setBoostActive(true)
-                            VolumeBoosterService.startService(this@MainActivity, newPercent)
-                        } else if (isBoostActive) {
-                            VolumeBoosterService.updatePercent(this@MainActivity, newPercent)
-                        }
-                    },
                     label = "Boost Amplification",
-                    sublabel = "Increases volume past normal 100% Android speaker ceiling",
+                    sublabel = "Amplifies audio volume past standard 100% Android speaker ceiling",
                     isBoostMode = true,
-                    enabled = isBoostActive
+                    enabled = true,
+                    presets = listOf(0, 20, 40, 60, 80, 100)
                 )
 
-                // 4. Standard System Media Volume Slider
+                // 2. Standard System Media Volume Line Slider
                 val systemVolumePercent = ((systemVolume.toFloat() / maxVolume) * 100).toInt()
                 MaterialExpressiveSlider(
                     value = systemVolumePercent,
@@ -287,216 +248,14 @@ class MainActivity : ComponentActivity() {
                         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVol, 0)
                     },
                     label = "System Media Volume",
-                    sublabel = "Base device audio stream level (0% to 100%)",
+                    sublabel = "Standard device audio stream level (0% to 100%)",
                     isBoostMode = false,
                     enabled = true,
                     prefix = "",
                     unit = "%"
                 )
 
-                // 5. Quick Settings Tile Card
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    color = SurfaceContainer,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(
-                                    modifier = Modifier.size(32.dp),
-                                    shape = RoundedCornerShape(10.dp),
-                                    color = ThemePrimary
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Canvas(modifier = Modifier.size(16.dp)) {
-                                            val path = Path().apply {
-                                                moveTo(size.width * 0.55f, 0f)
-                                                lineTo(size.width * 0.1f, size.height * 0.55f)
-                                                lineTo(size.width * 0.5f, size.height * 0.55f)
-                                                lineTo(size.width * 0.45f, size.height)
-                                                lineTo(size.width * 0.9f, size.height * 0.45f)
-                                                lineTo(size.width * 0.5f, size.height * 0.45f)
-                                                close()
-                                            }
-                                            drawPath(path, color = ThemeOnPrimary)
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Column {
-                                    Text(
-                                        text = "Quick Settings Tile",
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TextPrimaryWhite
-                                    )
-                                    Text(
-                                        text = "Quick Settings Integration",
-                                        fontSize = 11.sp,
-                                        color = TextSecondaryMuted
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        // Interactive Tile Preview Button
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(16.dp))
-                                .clickable {
-                                    isBoostActive = !isBoostActive
-                                    prefs.setBoostActive(isBoostActive)
-                                    if (isBoostActive) {
-                                        VolumeBoosterService.startService(this@MainActivity, boostPercent)
-                                    } else {
-                                        VolumeBoosterService.stopService(this@MainActivity)
-                                    }
-                                },
-                            shape = RoundedCornerShape(16.dp),
-                            color = if (isBoostActive) ThemePrimary else Color(0xFF211F26),
-                            border = androidx.compose.foundation.BorderStroke(
-                                1.dp,
-                                if (isBoostActive) androidx.compose.ui.graphics.Color.Transparent else SurfaceBorder
-                            )
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(14.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Surface(
-                                    modifier = Modifier.size(36.dp),
-                                    shape = CircleShape,
-                                    color = if (isBoostActive) Color(0x33000000) else Color(0xFF2A2830)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Canvas(modifier = Modifier.size(18.dp)) {
-                                            val path = Path().apply {
-                                                moveTo(size.width * 0.55f, 0f)
-                                                lineTo(size.width * 0.1f, size.height * 0.55f)
-                                                lineTo(size.width * 0.5f, size.height * 0.55f)
-                                                lineTo(size.width * 0.45f, size.height)
-                                                lineTo(size.width * 0.9f, size.height * 0.45f)
-                                                lineTo(size.width * 0.5f, size.height * 0.45f)
-                                                close()
-                                            }
-                                            drawPath(
-                                                path,
-                                                color = if (isBoostActive) ThemeOnPrimary else Color(0xFF94A3B8)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.width(12.dp))
-
-                                Column {
-                                    Text(
-                                        text = "Volume Booster Tile",
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isBoostActive) ThemeOnPrimary else TextPrimaryWhite
-                                    )
-                                    Text(
-                                        text = if (isBoostActive) "+$boostPercent% Active · Tap to Toggle" else "Off · Tap to Activate",
-                                        fontSize = 11.sp,
-                                        color = if (isBoostActive) ThemeOnPrimary.copy(alpha = 0.8f) else TextSecondaryMuted
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // 6. Crash Reports & Storage Diagnostics Card
-                var latestCrashLog by remember { mutableStateOf(CrashReporter.getLatestCrashLog(this@MainActivity)) }
-                val storagePath = remember { CrashReporter.getStorageLocation(this@MainActivity) }
-
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    color = SurfaceContainer,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(10.dp)
-                                        .clip(CircleShape)
-                                        .background(if (latestCrashLog != null) AmberWarning else EmeraldSafe)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Column {
-                                    Text(
-                                        text = "Crash Diagnostics & Storage",
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TextPrimaryWhite
-                                    )
-                                    Text(
-                                        text = if (latestCrashLog != null) "Crash log saved to storage" else "Crash monitoring active (0 crashes)",
-                                        fontSize = 11.sp,
-                                        color = if (latestCrashLog != null) AmberWarning else TextSecondaryMuted
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        Text(
-                            text = "Storage Path:\n$storagePath",
-                            fontSize = 10.sp,
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                            color = TextSecondaryMuted,
-                            lineHeight = 14.sp
-                        )
-
-                        if (latestCrashLog != null) {
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Button(
-                                    onClick = { CrashReporter.shareLatestCrashLog(this@MainActivity) },
-                                    modifier = Modifier.weight(1f).height(38.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = ThemePrimaryContainer)
-                                ) {
-                                    Text("Share / View Log", fontSize = 12.sp, color = TextPrimaryWhite)
-                                }
-
-                                OutlinedButton(
-                                    onClick = {
-                                        CrashReporter.clearLogs(this@MainActivity)
-                                        latestCrashLog = null
-                                    },
-                                    modifier = Modifier.height(38.dp),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Text("Clear", fontSize = 12.sp, color = TextSecondaryMuted)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }

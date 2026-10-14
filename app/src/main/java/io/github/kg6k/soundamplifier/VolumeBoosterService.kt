@@ -5,46 +5,69 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.graphics.Color
+import android.media.audiofx.AudioEffect
 import android.media.audiofx.LoudnessEnhancer
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import androidx.media.app.NotificationCompat.MediaStyle
+import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Crash-resilient Foreground Audio Amplification Service
- * With interactive notification panel slider and step buttons
+ * High-performance Foreground Audio Amplification Service
+ * Delivers real audible volume enhancement (up to +40 dB / 4000 mB)
+ * with dynamic session hooking across third-party media players (YouTube, Spotify, etc.)
  */
 class VolumeBoosterService : Service() {
 
-    private var loudnessEnhancer: LoudnessEnhancer? = null
     private val CHANNEL_ID = "sound_amplifier_foreground_channel"
     private val NOTIF_ID = 2001
     private val TAG = "VolumeBoosterService"
 
+    // Primary global session enhancer (session 0)
+    private var globalEnhancer: LoudnessEnhancer? = null
+
+    // Pool of active media player sessions (e.g. YouTube, Spotify, Chrome)
+    private val sessionEnhancers = ConcurrentHashMap<Int, LoudnessEnhancer>()
+
+    // Current boost percentage (0 to 100)
+    private var currentBoostPercent = 0
+
+    // Receiver to catch new audio sessions from any running music or video app
+    private val audioSessionReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val action = intent?.action ?: return
+            val sessionId = intent.getIntExtra(AudioEffect.EXTRA_AUDIO_SESSION, AudioEffect.ERROR)
+            if (sessionId == AudioEffect.ERROR || sessionId <= 0) return
+
+            when (action) {
+                AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION -> {
+                    Log.d(TAG, "Audio session opened: $sessionId")
+                    attachToSession(sessionId, currentBoostPercent)
+                }
+                AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION -> {
+                    Log.d(TAG, "Audio session closed: $sessionId")
+                    detachFromSession(sessionId)
+                }
+            }
+        }
+    }
+
     companion object {
-        const val ACTION_ENABLE_BOOST = "io.github.kg6k.soundamplifier.ENABLE"
-        const val ACTION_DISABLE_BOOST = "io.github.kg6k.soundamplifier.DISABLE"
         const val ACTION_SET_PERCENT = "io.github.kg6k.soundamplifier.SET_PERCENT"
         const val ACTION_STEP_BOOST = "io.github.kg6k.soundamplifier.STEP_BOOST"
+        const val ACTION_STOP = "io.github.kg6k.soundamplifier.STOP"
         const val EXTRA_PERCENT = "percent"
         const val EXTRA_STEP = "step"
 
-        fun startService(context: Context, percent: Int) {
-            val intent = Intent(context, VolumeBoosterService::class.java).apply {
-                action = ACTION_ENABLE_BOOST
-                putExtra(EXTRA_PERCENT, percent)
-            }
-            dispatchServiceIntent(context, intent)
-        }
-
-        fun updatePercent(context: Context, percent: Int) {
+        fun setBoost(context: Context, percent: Int) {
             val intent = Intent(context, VolumeBoosterService::class.java).apply {
                 action = ACTION_SET_PERCENT
                 putExtra(EXTRA_PERCENT, percent)
@@ -54,7 +77,7 @@ class VolumeBoosterService : Service() {
 
         fun stopService(context: Context) {
             val intent = Intent(context, VolumeBoosterService::class.java).apply {
-                action = ACTION_DISABLE_BOOST
+                action = ACTION_STOP
             }
             dispatchServiceIntent(context, intent)
         }
@@ -75,33 +98,40 @@ class VolumeBoosterService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+
+        // Register listener for media players opening audio sessions
+        try {
+            val filter = IntentFilter().apply {
+                addAction(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
+                addAction(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
+            }
+            registerReceiver(audioSessionReceiver, filter)
+        } catch (t: Throwable) {
+            Log.e(TAG, "Error registering session receiver", t)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val action = intent?.action ?: ACTION_ENABLE_BOOST
         val prefs = getSharedPreferences("sound_amplifier_prefs", MODE_PRIVATE)
-        var currentPercent = prefs.getInt("boost_percent", 50)
+        val savedPercent = prefs.getInt("boost_percent", 0)
+        val action = intent?.action ?: ACTION_SET_PERCENT
 
         // Always satisfy Android foreground service contract immediately
-        safeStartForeground(currentPercent)
+        safeStartForeground(savedPercent)
 
         when (action) {
-            ACTION_ENABLE_BOOST -> {
-                val newPct = intent?.getIntExtra(EXTRA_PERCENT, currentPercent) ?: currentPercent
-                applyAndSaveBoost(newPct, true)
-            }
             ACTION_SET_PERCENT -> {
-                val newPct = intent?.getIntExtra(EXTRA_PERCENT, currentPercent) ?: currentPercent
-                applyAndSaveBoost(newPct, true)
+                val newPct = intent?.getIntExtra(EXTRA_PERCENT, savedPercent) ?: savedPercent
+                applyAndSaveBoost(newPct)
             }
             ACTION_STEP_BOOST -> {
                 val step = intent?.getIntExtra(EXTRA_STEP, 0) ?: 0
-                val newPct = (currentPercent + step).coerceIn(0, 100)
-                applyAndSaveBoost(newPct, true)
+                val newPct = (currentBoostPercent + step).coerceIn(0, 100)
+                applyAndSaveBoost(newPct)
             }
-            ACTION_DISABLE_BOOST -> {
-                prefs.edit().putBoolean("is_boost_active", false).apply()
-                releaseLoudnessEnhancer()
+            ACTION_STOP -> {
+                applyAndSaveBoost(0)
+                releaseAllEnhancers()
                 safeStopForeground()
                 stopSelf()
             }
@@ -109,15 +139,103 @@ class VolumeBoosterService : Service() {
         return START_STICKY
     }
 
-    private fun applyAndSaveBoost(percent: Int, active: Boolean) {
+    private fun applyAndSaveBoost(percent: Int) {
+        currentBoostPercent = percent
         val prefs = getSharedPreferences("sound_amplifier_prefs", MODE_PRIVATE)
         prefs.edit()
             .putInt("boost_percent", percent)
-            .putBoolean("is_boost_active", active)
+            .putBoolean("is_boost_active", percent > 0)
             .apply()
 
-        applyLoudnessBoost(percent, active)
-        updateNotification(percent)
+        if (percent > 0) {
+            applyLoudnessGain(percent)
+            updateNotification(percent)
+        } else {
+            // At 0% boost, silence effect and gracefully remove foreground notification
+            releaseAllEnhancers()
+            safeStopForeground()
+            stopSelf()
+        }
+    }
+
+    /**
+     * Real Audible Gain Mapping:
+     * 100% boost -> 4000 millibels (+40 dB)
+     * 50% boost  -> 2000 millibels (+20 dB)
+     * 25% boost  -> 1000 millibels (+10 dB)
+     */
+    private fun applyLoudnessGain(percent: Int) {
+        val millibels = (percent * 40).coerceIn(0, 4000)
+
+        // 1. Apply to global session 0
+        try {
+            if (globalEnhancer == null) {
+                globalEnhancer = LoudnessEnhancer(0)
+            }
+            globalEnhancer?.setTargetGain(millibels)
+            globalEnhancer?.enabled = true
+        } catch (t: Throwable) {
+            Log.e(TAG, "Global LoudnessEnhancer error: ${t.message}")
+        }
+
+        // 2. Broadcast effect session announcement so system audio policy routes to enhancer
+        try {
+            val intent = Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
+                putExtra(AudioEffect.EXTRA_AUDIO_SESSION, 0)
+                putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
+            }
+            sendBroadcast(intent)
+        } catch (ignored: Throwable) {}
+
+        // 3. Apply to all actively tracked third-party player sessions
+        sessionEnhancers.forEach { (sessionId, enhancer) ->
+            try {
+                enhancer.setTargetGain(millibels)
+                enhancer.enabled = true
+            } catch (t: Throwable) {
+                Log.e(TAG, "Session $sessionId gain error: ${t.message}")
+            }
+        }
+    }
+
+    private fun attachToSession(sessionId: Int, percent: Int) {
+        if (percent <= 0) return
+        try {
+            val millibels = (percent * 40).coerceIn(0, 4000)
+            val enhancer = sessionEnhancers.getOrPut(sessionId) {
+                LoudnessEnhancer(sessionId)
+            }
+            enhancer.setTargetGain(millibels)
+            enhancer.enabled = true
+            Log.d(TAG, "Attached LoudnessEnhancer to session $sessionId at $millibels mB")
+        } catch (t: Throwable) {
+            Log.e(TAG, "Failed attaching enhancer to session $sessionId: ${t.message}")
+        }
+    }
+
+    private fun detachFromSession(sessionId: Int) {
+        try {
+            val enhancer = sessionEnhancers.remove(sessionId)
+            enhancer?.enabled = false
+            enhancer?.release()
+        } catch (ignored: Throwable) {}
+    }
+
+    private fun releaseAllEnhancers() {
+        try {
+            globalEnhancer?.enabled = false
+            globalEnhancer?.release()
+        } catch (ignored: Throwable) {} finally {
+            globalEnhancer = null
+        }
+
+        sessionEnhancers.forEach { (_, enhancer) ->
+            try {
+                enhancer.enabled = false
+                enhancer.release()
+            } catch (ignored: Throwable) {}
+        }
+        sessionEnhancers.clear()
     }
 
     private fun safeStartForeground(percent: Int) {
@@ -158,36 +276,6 @@ class VolumeBoosterService : Service() {
         }
     }
 
-    private fun applyLoudnessBoost(percent: Int, active: Boolean) {
-        try {
-            if (loudnessEnhancer == null) {
-                loudnessEnhancer = LoudnessEnhancer(0)
-            }
-            if (!active || percent <= 0) {
-                loudnessEnhancer?.enabled = false
-                return
-            }
-
-            // 100% boost maps to +10 dB (1000 millibels)
-            val millibels = (percent * 10).coerceIn(0, 1000)
-            loudnessEnhancer?.setTargetGain(millibels)
-            loudnessEnhancer?.enabled = true
-        } catch (t: Throwable) {
-            Log.e(TAG, "LoudnessEnhancer error: ${t.message}", t)
-        }
-    }
-
-    private fun releaseLoudnessEnhancer() {
-        try {
-            loudnessEnhancer?.enabled = false
-            loudnessEnhancer?.release()
-        } catch (t: Throwable) {
-            Log.e(TAG, "Error releasing LoudnessEnhancer: ${t.message}")
-        } finally {
-            loudnessEnhancer = null
-        }
-    }
-
     private fun buildNotification(percent: Int): Notification {
         val openAppIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -199,70 +287,51 @@ class VolumeBoosterService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Notification Step Controls: -10%, +10%, Max (100%), and Pause
+        // Step down -20%
         val stepDownIntent = PendingIntent.getService(
             this,
             1,
             Intent(this, VolumeBoosterService::class.java).apply {
                 action = ACTION_STEP_BOOST
-                putExtra(EXTRA_STEP, -10)
+                putExtra(EXTRA_STEP, -20)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // Step up +20%
         val stepUpIntent = PendingIntent.getService(
             this,
             2,
             Intent(this, VolumeBoosterService::class.java).apply {
                 action = ACTION_STEP_BOOST
-                putExtra(EXTRA_STEP, 10)
+                putExtra(EXTRA_STEP, 20)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val maxIntent = PendingIntent.getService(
+        // Turn off / Reset to 0%
+        val stopIntent = PendingIntent.getService(
             this,
             3,
             Intent(this, VolumeBoosterService::class.java).apply {
-                action = ACTION_SET_PERCENT
-                putExtra(EXTRA_PERCENT, 100)
+                action = ACTION_STOP
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val pauseIntent = PendingIntent.getService(
-            this,
-            4,
-            Intent(this, VolumeBoosterService::class.java).apply {
-                action = ACTION_DISABLE_BOOST
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val dbText = String.format("+%.1f dB", percent / 10f)
+        val dbGain = String.format("+%.1f dB", (percent * 40) / 100f)
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Sound Amplifier: +$percent% ($dbText)")
-            .setContentText("Active Amplification · Tap actions below to adjust")
+            .setContentTitle("Sound Amplifier: +$percent% ($dbGain)")
+            .setContentText("Active background volume boost • Tap to adjust")
             .setSmallIcon(R.drawable.ic_qs_volume_boost)
-            .setColor(Color.parseColor("#8B5CF6")) // Vibrant primary violet accent
-            .setColorized(true)
+            .setColor(Color.parseColor("#6750A4"))
             .setContentIntent(pendingOpenApp)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            // Visual Progress Slider in the notification panel (0 to 100)
-            .setProgress(100, percent, false)
-            // Interactive quick actions right in the notification shade
-            .addAction(0, "−10%", stepDownIntent)
-            .addAction(0, "+10%", stepUpIntent)
-            .addAction(0, "Max", maxIntent)
-            .addAction(0, "Pause", pauseIntent)
-            .setStyle(
-                MediaStyle()
-                    .setShowActionsInCompactView(0, 1, 3) // -10%, +10%, and Pause in compact view
-            )
+            .addAction(0, "Turn Off", stopIntent)
             .build()
     }
 
@@ -274,7 +343,7 @@ class VolumeBoosterService : Service() {
                     "Sound Amplifier Service",
                     NotificationManager.IMPORTANCE_LOW
                 ).apply {
-                    description = "Interactive audio amplification controls"
+                    description = "Active audio amplification status"
                     setShowBadge(false)
                 }
                 val nm = getSystemService(NotificationManager::class.java)
@@ -286,7 +355,10 @@ class VolumeBoosterService : Service() {
     }
 
     override fun onDestroy() {
-        releaseLoudnessEnhancer()
+        try {
+            unregisterReceiver(audioSessionReceiver)
+        } catch (ignored: Throwable) {}
+        releaseAllEnhancers()
         super.onDestroy()
     }
 

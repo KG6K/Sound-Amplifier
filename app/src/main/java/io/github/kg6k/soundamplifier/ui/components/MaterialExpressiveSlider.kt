@@ -6,7 +6,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,6 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kg6k.soundamplifier.ui.theme.*
 
+/**
+ * Sleek modern line slider with round elevated thumb,
+ * horizontal status pill, and one-tap quick preset chips.
+ * Fine-tune strip removed for clean, minimal UI.
+ * Adapts automatically to system light/dark theme.
+ */
 @Composable
 fun MaterialExpressiveSlider(
     value: Int,
@@ -31,118 +39,148 @@ fun MaterialExpressiveSlider(
     modifier: Modifier = Modifier,
     min: Int = 0,
     max: Int = 100,
-    step: Int = 5,
+    step: Int = 1,
     isBoostMode: Boolean = true,
     enabled: Boolean = true,
     prefix: String = if (isBoostMode) "+" else "",
-    unit: String = "%"
+    unit: String = "%",
+    presets: List<Int> = listOf(0, 20, 40, 60, 80, 100)
 ) {
-    // Determine color and status badge based on level
+    val isDark = isSystemInDarkTheme()
+    val colorScheme = MaterialTheme.colorScheme
+
+    // Dynamic color coding based on level
     val trackColor by animateColorAsState(
         targetValue = when {
-            !enabled || value == 0 -> Color(0xFF64748B)
+            value == 0 -> if (isDark) Color(0xFF64748B) else Color(0xFF94A3B8)
             isBoostMode && value <= 30 -> EmeraldSafe
-            isBoostMode && value <= 70 -> AmberWarning
+            isBoostMode && value <= 60 -> AmberWarning
             isBoostMode -> RedDanger
-            else -> ThemePrimary
+            else -> colorScheme.primary
         },
         label = "track_color"
     )
 
     val (badgeText, badgeBg, badgeTextColor, badgeBorder) = when {
-        !enabled -> Quad("Disabled", Color(0xFF1E293B), Color(0xFF94A3B8), Color(0xFF334155))
-        value == 0 -> Quad("Off", Color(0xFF1E293B), Color(0xFF94A3B8), Color(0xFF334155))
-        isBoostMode && value <= 30 -> Quad("Safe Boost", EmeraldBackground, EmeraldSafe, EmeraldSafe.copy(alpha = 0.4f))
-        isBoostMode && value <= 70 -> Quad("High Volume", AmberBackground, AmberWarning, AmberWarning.copy(alpha = 0.4f))
-        isBoostMode -> Quad("Max Boost", RedBackground, RedDanger, RedDanger.copy(alpha = 0.4f))
-        else -> Quad("Normal", Color(0xFF1E293B), ThemePrimary, ThemePrimary.copy(alpha = 0.4f))
+        value == 0 -> Quad(
+            "Off",
+            if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
+            if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B),
+            if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1)
+        )
+        isBoostMode && value <= 30 -> Quad(
+            "Safe Boost",
+            if (isDark) EmeraldBackground else EmeraldBackgroundLight,
+            EmeraldSafe,
+            EmeraldSafe.copy(alpha = 0.4f)
+        )
+        isBoostMode && value <= 60 -> Quad(
+            "High Volume",
+            if (isDark) AmberBackground else AmberBackgroundLight,
+            AmberWarning,
+            AmberWarning.copy(alpha = 0.4f)
+        )
+        isBoostMode -> Quad(
+            "Max Boost",
+            if (isDark) RedBackground else RedBackgroundLight,
+            RedDanger,
+            RedDanger.copy(alpha = 0.4f)
+        )
+        else -> Quad(
+            "Normal",
+            if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
+            colorScheme.primary,
+            colorScheme.primary.copy(alpha = 0.4f)
+        )
     }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        color = SurfaceContainer,
-        border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
+        shape = RoundedCornerShape(20.dp),
+        color = colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(1.dp, colorScheme.outline)
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
-            // Header Row: Label, Status Badge, and Value Pill
+            // Header Row: Label, Status Pill Badge, and Tabular Value Display
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = label,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimaryWhite
-                        )
+                // Label + Horizontal Badge (strictly horizontal, no wrapping)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
+                ) {
+                    Text(
+                        text = label,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onSurface
+                    )
+
+                    if (isBoostMode) {
                         Spacer(modifier = Modifier.width(8.dp))
-                        if (isBoostMode) {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = badgeBg,
-                                border = androidx.compose.foundation.BorderStroke(1.dp, badgeBorder)
-                            ) {
-                                Text(
-                                    text = badgeText,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = badgeTextColor
-                                )
-                            }
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = badgeBg,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, badgeBorder)
+                        ) {
+                            Text(
+                                text = badgeText,
+                                maxLines = 1,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = badgeTextColor
+                            )
                         }
                     }
-                    Spacer(modifier = Modifier.height(3.dp))
-                    Text(
-                        text = sublabel,
-                        fontSize = 12.sp,
-                        color = TextSecondaryMuted,
-                        lineHeight = 16.sp
-                    )
                 }
 
-                // Big Tabular Value Pill
+                // Tabular Value Display (+50%)
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = trackColor.copy(alpha = 0.15f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, trackColor.copy(alpha = 0.35f))
+                    border = androidx.compose.foundation.BorderStroke(1.dp, trackColor.copy(alpha = 0.4f))
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
-                            text = if (enabled) "$prefix$value" else "+0",
-                            fontSize = 24.sp,
+                            text = "$prefix$value",
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace,
                             color = trackColor
                         )
                         Text(
                             text = unit,
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = trackColor,
-                            modifier = Modifier.padding(bottom = 3.dp, start = 1.dp)
+                            modifier = Modifier.padding(bottom = 2.dp, start = 1.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = sublabel,
+                fontSize = 12.sp,
+                color = colorScheme.onSurfaceVariant,
+                lineHeight = 16.sp
+            )
 
-            // Expressive Thick 56dp Track Slider
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Sleek Modern Line Slider Track & Round Thumb
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(TrackBackgroundDark)
-                    .border(1.dp, TrackBorder, RoundedCornerShape(18.dp))
+                    .height(36.dp)
                     .pointerInput(enabled) {
                         if (!enabled) return@pointerInput
                         detectTapGestures { offset ->
@@ -161,148 +199,82 @@ fun MaterialExpressiveSlider(
                             val stepped = Math.round(rawVal.toFloat() / step) * step
                             onValueChange(stepped.coerceIn(min, max))
                         }
-                    }
+                    },
+                contentAlignment = Alignment.CenterStart
             ) {
-                val fraction = if (enabled) ((value - min).toFloat() / (max - min)).coerceIn(0f, 1f) else 0f
-                val activeWidth = (maxWidth - 8.dp) * fraction
+                val fraction = ((value - min).toFloat() / (max - min)).coerceIn(0f, 1f)
 
-                // Active Filled Color Track
+                // 1. Inactive Background Track Line (6dp height)
+                val inactiveTrackColor = if (isDark) Color(0xFF262A36) else Color(0xFFE2E8F0)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(inactiveTrackColor)
+                )
+
+                // 2. Active Filled Track Line
+                val activeWidth = maxWidth * fraction
                 if (activeWidth > 2.dp) {
                     Box(
                         modifier = Modifier
-                            .padding(4.dp)
-                            .fillMaxHeight()
                             .width(activeWidth)
-                            .clip(RoundedCornerShape(14.dp))
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp))
                             .background(trackColor)
                     )
                 }
 
-                // Background Grid Notches at 0%, 25%, 50%, 75%, 100%
-                val ticks = listOf(0, 25, 50, 75, 100)
-                ticks.forEach { tick ->
-                    val tickPct = (tick - min).toFloat() / (max - min)
-                    val isPassed = fraction >= tickPct
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .offset(x = (maxWidth * tickPct) - 2.dp)
-                            .size(width = 3.dp, height = 14.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(if (isPassed) Color(0x33000000) else Color(0x4464748B))
-                    )
-                }
-
-                // Distinctive White Tactile Capsule Thumb ( )
-                val thumbWidth = 24.dp
-                val thumbOffset = ((maxWidth - thumbWidth - 8.dp) * fraction) + 4.dp
+                // 3. Smooth Circular Elevated Thumb (22dp diameter)
+                val thumbSize = 22.dp
+                val thumbOffset = ((maxWidth - thumbSize) * fraction).coerceAtLeast(0.dp)
 
                 Box(
                     modifier = Modifier
-                        .offset(x = thumbOffset, y = 6.dp)
-                        .size(width = thumbWidth, height = 44.dp)
-                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(ThumbWhite)
-                ) {
-                    // Tactile vertical grip groove in thumb
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(width = 3.dp, height = 16.dp)
-                            .clip(RoundedCornerShape(1.dp))
-                            .background(Color(0xFF94A3B8))
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Floating Tick Labels
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                listOf(0, 25, 50, 75, 100).forEach { tick ->
-                    val isSelected = (value == tick && enabled)
-                    Text(
-                        text = "$prefix$tick$unit",
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .clickable(enabled = enabled) { onValueChange(tick) }
-                            .padding(horizontal = 4.dp, vertical = 2.dp),
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) TextPrimaryWhite else TextSecondaryMuted
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            HorizontalDivider(
-                color = SurfaceBorder,
-                thickness = 1.dp,
-                modifier = Modifier.padding(top = 10.dp, bottom = 8.dp)
-            )
-
-            // Fine-Tuning Step Controls Strip
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Fine-tune",
-                    fontSize = 12.sp,
-                    color = TextSecondaryMuted
+                        .offset(x = thumbOffset)
+                        .size(thumbSize)
+                        .shadow(elevation = 6.dp, shape = CircleShape)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .border(3.dp, trackColor, CircleShape)
                 )
+            }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Decrement Button
-                    Surface(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable(enabled = enabled) {
-                                onValueChange((value - step).coerceAtLeast(min))
-                            },
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF1E293B),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155))
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = "−",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimaryWhite
-                            )
-                        }
-                    }
+            // Quick Preset Chips (e.g. 0%, 20%, 40%, 60%, 80%, 100%)
+            if (isBoostMode) {
+                Spacer(modifier = Modifier.height(14.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val chipInactiveBg = if (isDark) Color(0xFF1E212B) else Color(0xFFF1F5F9)
+                    val chipInactiveBorder = if (isDark) Color(0xFF2C3242) else Color(0xFFCBD5E1)
 
-                    // Increment Button
-                    Surface(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable(enabled = enabled) {
-                                onValueChange((value + step).coerceAtMost(max))
-                            },
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF1E293B),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155))
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = "+",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimaryWhite
+                    presets.forEach { preset ->
+                        val isSelected = (value == preset)
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { onValueChange(preset) },
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isSelected) trackColor.copy(alpha = 0.2f) else chipInactiveBg,
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                if (isSelected) trackColor else chipInactiveBorder
                             )
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "$prefix$preset%",
+                                    fontSize = 11.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) trackColor else colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }

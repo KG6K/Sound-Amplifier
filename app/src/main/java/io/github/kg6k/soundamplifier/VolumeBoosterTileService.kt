@@ -29,7 +29,7 @@ class VolumeBoosterTileService : TileService() {
             prefs.edit().putBoolean("is_boost_active", newActiveState).apply()
 
             if (newActiveState) {
-                VolumeBoosterService.startService(this, boostPercent)
+                VolumeBoosterService.setBoost(this, boostPercent)
             } else {
                 VolumeBoosterService.stopService(this)
             }
