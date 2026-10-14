@@ -91,7 +91,6 @@ export default function App() {
         {/* 1. PRIMARY: Boost Amplification Modern Line Slider */}
         <MaterialSlider
           label="Boost Amplification"
-          sublabel="Amplifies audio volume past standard 100% Android speaker ceiling"
           value={boostPercentage}
           min={0}
           max={100}

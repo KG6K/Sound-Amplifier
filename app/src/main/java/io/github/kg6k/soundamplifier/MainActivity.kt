@@ -264,7 +264,7 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     label = "Boost Amplification",
-                    sublabel = "Amplifies audio volume past standard 100% Android speaker ceiling",
+                    sublabel = "",
                     isBoostMode = true,
                     enabled = true
                 )

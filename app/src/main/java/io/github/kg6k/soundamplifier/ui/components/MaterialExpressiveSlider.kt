@@ -83,30 +83,36 @@ fun MaterialExpressiveSlider(
                     modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
                 )
 
-                // Compact Value Display (+50%)
+                // Fixed-dimension Stable Value Display (Does not jitter or resize)
                 Surface(
+                    modifier = Modifier.width(56.dp).height(24.dp),
                     shape = RoundedCornerShape(8.dp),
                     color = trackColor.copy(alpha = 0.15f),
                     border = androidx.compose.foundation.BorderStroke(1.dp, trackColor.copy(alpha = 0.4f))
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        verticalAlignment = Alignment.Bottom
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "$prefix$value",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            color = trackColor
-                        )
-                        Text(
-                            text = unit,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = trackColor,
-                            modifier = Modifier.padding(bottom = 1.dp, start = 1.dp)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "$prefix$value",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                color = trackColor
+                            )
+                            Text(
+                                text = unit,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = trackColor,
+                                modifier = Modifier.padding(bottom = 1.dp, start = 1.dp)
+                            )
+                        }
                     }
                 }
             }

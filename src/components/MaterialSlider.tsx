@@ -144,20 +144,20 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
           </span>
         </div>
 
-        {/* Compact Value Display */}
+        {/* Fixed-dimension Stable Value Display (Does not jitter or resize) */}
         <div
-          className="px-2 py-0.5 rounded-lg flex items-baseline font-mono border"
+          className="w-14 h-6 px-1 rounded-lg flex items-center justify-center font-mono border tabular-nums shrink-0"
           style={{
             backgroundColor: `${trackColor}18`,
             borderColor: `${trackColor}40`,
             color: trackColor,
           }}
         >
-          <span className="text-sm font-bold">
+          <span className="text-sm font-bold text-center inline-flex items-baseline">
             {prefix}
             {value}
+            <span className="text-[10px] font-bold ml-0.5">{unit}</span>
           </span>
-          <span className="text-[10px] font-bold ml-0.5">{unit}</span>
         </div>
       </div>
 
