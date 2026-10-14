@@ -187,12 +187,12 @@ class MainActivity : ComponentActivity() {
                             shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.primary
                         ) {
+                            val iconColor = MaterialTheme.colorScheme.onPrimary
                             Box(contentAlignment = Alignment.Center) {
                                 Canvas(modifier = Modifier.size(18.dp)) {
                                     val w = size.width
                                     val h = size.height
                                     val strokeWidth = 1.75.dp.toPx()
-                                    val iconColor = MaterialTheme.colorScheme.onPrimary
 
                                     // Speaker horn body
                                     val speakerPath = Path().apply {
