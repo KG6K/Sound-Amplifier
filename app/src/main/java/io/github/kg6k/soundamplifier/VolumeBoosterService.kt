@@ -105,7 +105,11 @@ class VolumeBoosterService : Service() {
                 addAction(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
                 addAction(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
             }
-            registerReceiver(audioSessionReceiver, filter)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(audioSessionReceiver, filter, Context.RECEIVER_EXPORTED)
+            } else {
+                registerReceiver(audioSessionReceiver, filter)
+            }
         } catch (t: Throwable) {
             Log.e(TAG, "Error registering session receiver", t)
         }

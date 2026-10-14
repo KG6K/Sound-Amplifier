@@ -59,8 +59,17 @@ object CrashReporter {
             appendLine("SOUND AMPLIFIER - CRASH REPORT")
             appendLine("==========================================")
             appendLine("Timestamp       : $readableDate")
-            appendLine("Package         : ${context.packageName}")
-            appendLine("App Version     : 1.0.0-alpha1 (2)")
+            val versionStr = try {
+                val pInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageInfo(context.packageName, android.content.pm.PackageManager.PackageInfoFlags.of(0))
+                } else {
+                    context.packageManager.getPackageInfo(context.packageName, 0)
+                }
+                "${pInfo.versionName} (${androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(pInfo)})"
+            } catch (_: Throwable) {
+                "1.0.0-alpha2 (3)"
+            }
+            appendLine("App Version     : $versionStr")
             appendLine("Device Model    : ${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE})")
             appendLine("Android Version : Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
             appendLine("Fingerprint     : ${Build.FINGERPRINT}")

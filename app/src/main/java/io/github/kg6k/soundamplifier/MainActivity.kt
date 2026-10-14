@@ -53,9 +53,19 @@ class MainActivity : ComponentActivity() {
 
         syncWithPreferences()
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
+
         try {
             val filter = IntentFilter("android.media.VOLUME_CHANGED_ACTION")
-            registerReceiver(volumeReceiver, filter)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(volumeReceiver, filter, Context.RECEIVER_EXPORTED)
+            } else {
+                registerReceiver(volumeReceiver, filter)
+            }
         } catch (ignored: Throwable) {}
 
         setContent {
