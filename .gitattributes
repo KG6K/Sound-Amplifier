@@ -7,3 +7,17 @@
 *.gradle.kts text eol=lf
 *.kt text eol=lf
 *.xml text eol=lf
+
+# GitHub Linguist Overrides: Ensure repository language is 100% Kotlin
+# Mark web preview/simulator files as vendored/non-detectable
+src/** linguist-detectable=false linguist-vendored=true
+*.ts linguist-detectable=false linguist-vendored=true
+*.tsx linguist-detectable=false linguist-vendored=true
+*.json linguist-detectable=false linguist-vendored=true
+*.html linguist-detectable=false linguist-vendored=true
+*.css linguist-detectable=false linguist-vendored=true
+bun.lock linguist-detectable=false linguist-vendored=true
+
+# Mark Android source code as primary detectable language
+app/** linguist-detectable=true
+*.kt linguist-detectable=true
