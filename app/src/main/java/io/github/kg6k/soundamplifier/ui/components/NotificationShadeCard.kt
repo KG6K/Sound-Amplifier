@@ -118,16 +118,15 @@ fun NotificationShadeCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            HorizontalDivider(
+                color = Color(0xFF2E2C38),
+                thickness = 1.dp,
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
+            )
+
             // Actions Strip
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .border(
-                        width = androidx.compose.ui.unit.Dp.Hairline,
-                        color = Color(0xFF2E2C38)
-                    )
-                    .padding(top = 10.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

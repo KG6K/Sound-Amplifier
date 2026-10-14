@@ -243,16 +243,15 @@ fun MaterialExpressiveSlider(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            HorizontalDivider(
+                color = SurfaceBorder,
+                thickness = 1.dp,
+                modifier = Modifier.padding(top = 10.dp, bottom = 8.dp)
+            )
+
             // Fine-Tuning Step Controls Strip
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp)
-                    .border(
-                        width = androidx.compose.ui.unit.Dp.Hairline,
-                        color = SurfaceBorder
-                    )
-                    .padding(top = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
