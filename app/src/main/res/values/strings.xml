@@ -2,4 +2,8 @@
     <string name="app_name">Sound Amplifier</string>
     <string name="tile_label">Sound Amplifier</string>
     <string name="channel_name">Sound Amplifier Service</string>
+    <string name="donate">Donate</string>
+    <string name="boost_amplification">Boost Amplification</string>
+    <string name="system_media_volume">System Media Volume</string>
+    <string name="warning_high_volume">Warning: Playing audio at high volumes may damage speakers/hearing. ALL USE IS AT YOUR OWN RISK. Particularly beware of boosts above 60%, especially with music.</string>
 </resources>

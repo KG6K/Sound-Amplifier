@@ -51,7 +51,8 @@ class VolumeBoosterTileService : TileService() {
                 tile.state = Tile.STATE_ACTIVE
                 tile.label = getString(R.string.tile_label)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    tile.subtitle = "+$boostPercent% Boost"
+                    val dbGain = (boostPercent * 60) / 100
+                    tile.subtitle = "+$boostPercent% (+$dbGain dB)"
                 }
             } else {
                 tile.state = Tile.STATE_INACTIVE

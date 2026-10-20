@@ -168,6 +168,36 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        var showDonateDialog by remember { mutableStateOf(false) }
+
+        if (showDonateDialog) {
+            AlertDialog(
+                onDismissRequest = { showDonateDialog = false },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(text = "❤️", fontSize = 18.sp)
+                        Text(
+                            text = "Support Development",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                },
+                text = {
+                    Text(
+                        text = "Thank you for wanting to support Sound Amplifier! Donation options and links will be configured here.",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                confirmButton = {
+                    Button(onClick = { showDonateDialog = false }) {
+                        Text("Close")
+                    }
+                }
+            )
+        }
+
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
@@ -183,49 +213,96 @@ class MainActivity : ComponentActivity() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            modifier = Modifier.size(38.dp),
+                            modifier = Modifier.size(40.dp),
                             shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.primary
+                            color = Color(0xFF0C0A14),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF6834CD).copy(alpha = 0.5f))
                         ) {
-                            val iconColor = MaterialTheme.colorScheme.onPrimary
                             Box(contentAlignment = Alignment.Center) {
-                                Canvas(modifier = Modifier.size(18.dp)) {
+                                Canvas(modifier = Modifier.size(34.dp)) {
                                     val w = size.width
                                     val h = size.height
-                                    val strokeWidth = 1.75.dp.toPx()
 
-                                    // Speaker horn body
-                                    val speakerPath = Path().apply {
-                                        moveTo(w * 0.12f, h * 0.35f)
-                                        lineTo(w * 0.32f, h * 0.35f)
-                                        lineTo(w * 0.58f, h * 0.15f)
-                                        lineTo(w * 0.58f, h * 0.85f)
-                                        lineTo(w * 0.32f, h * 0.65f)
-                                        lineTo(w * 0.12f, h * 0.65f)
-                                        close()
-                                    }
-                                    drawPath(speakerPath, color = iconColor)
-
-                                    // Inner sound wave arc
-                                    drawArc(
-                                        color = iconColor,
-                                        startAngle = -45f,
-                                        sweepAngle = 90f,
-                                        useCenter = false,
-                                        topLeft = Offset(w * 0.44f, h * 0.28f),
-                                        size = Size(w * 0.30f, h * 0.44f),
-                                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                                    // Outer purple ring
+                                    drawCircle(
+                                        color = Color(0xFF6834CD),
+                                        radius = w * 0.44f,
+                                        style = Stroke(width = 1.2.dp.toPx())
                                     )
 
-                                    // Outer sound wave arc
+                                    // Left lavender pill arc accent
                                     drawArc(
-                                        color = iconColor,
+                                        color = Color(0xFFAA80F9),
+                                        startAngle = 142f,
+                                        sweepAngle = 76f,
+                                        useCenter = false,
+                                        topLeft = Offset(w * 0.06f, h * 0.06f),
+                                        size = Size(w * 0.88f, h * 0.88f),
+                                        style = Stroke(width = 2.4.dp.toPx(), cap = StrokeCap.Round)
+                                    )
+
+                                    // Right lavender pill arc accent
+                                    drawArc(
+                                        color = Color(0xFFAA80F9),
+                                        startAngle = -38f,
+                                        sweepAngle = 76f,
+                                        useCenter = false,
+                                        topLeft = Offset(w * 0.06f, h * 0.06f),
+                                        size = Size(w * 0.88f, h * 0.88f),
+                                        style = Stroke(width = 2.4.dp.toPx(), cap = StrokeCap.Round)
+                                    )
+
+                                    // Inner purple disc
+                                    drawCircle(
+                                        color = Color(0xFF4A18B7),
+                                        radius = w * 0.32f
+                                    )
+                                    drawCircle(
+                                        color = Color(0xFF6C33E2),
+                                        radius = w * 0.32f,
+                                        style = Stroke(width = 2.dp.toPx())
+                                    )
+
+                                    // Yellow speaker horn outline
+                                    val speakerPath = Path().apply {
+                                        moveTo(w * 0.28f, h * 0.44f)
+                                        lineTo(w * 0.38f, h * 0.44f)
+                                        lineTo(w * 0.50f, h * 0.33f)
+                                        lineTo(w * 0.50f, h * 0.67f)
+                                        lineTo(w * 0.38f, h * 0.56f)
+                                        lineTo(w * 0.28f, h * 0.56f)
+                                        close()
+                                    }
+                                    drawPath(
+                                        path = speakerPath,
+                                        color = Color(0xFFFFE600),
+                                        style = Stroke(
+                                            width = 1.8.dp.toPx(),
+                                            cap = StrokeCap.Round,
+                                            join = androidx.compose.ui.graphics.StrokeJoin.Round
+                                        )
+                                    )
+
+                                    // Inner yellow sound wave arc
+                                    drawArc(
+                                        color = Color(0xFFFFE600),
+                                        startAngle = -42f,
+                                        sweepAngle = 84f,
+                                        useCenter = false,
+                                        topLeft = Offset(w * 0.42f, h * 0.39f),
+                                        size = Size(w * 0.22f, h * 0.22f),
+                                        style = Stroke(width = 1.8.dp.toPx(), cap = StrokeCap.Round)
+                                    )
+
+                                    // Outer yellow sound wave arc
+                                    drawArc(
+                                        color = Color(0xFFFFE600),
                                         startAngle = -45f,
                                         sweepAngle = 90f,
                                         useCenter = false,
-                                        topLeft = Offset(w * 0.52f, h * 0.16f),
-                                        size = Size(w * 0.42f, h * 0.68f),
-                                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                                        topLeft = Offset(w * 0.38f, h * 0.31f),
+                                        size = Size(w * 0.38f, h * 0.38f),
+                                        style = Stroke(width = 1.8.dp.toPx(), cap = StrokeCap.Round)
                                     )
                                 }
                             }
@@ -240,13 +317,39 @@ class MainActivity : ComponentActivity() {
                             )
                             Text(
                                 text = if (boostPercent > 0) {
-                                    "Amplification active (+${(boostPercent * 40) / 100} dB)"
+                                    "Amplification active (+${(boostPercent * 60) / 100} dB)"
                                 } else {
                                     "Amplification idle (0%)"
                                 },
                                 fontSize = 11.sp,
                                 color = if (boostPercent > 0) AmberWarning else MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.height(32.dp),
+                            onClick = {
+                                showDonateDialog = true
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = "❤️",
+                                    fontSize = 12.sp
+                                )
+                                Text(
+                                    text = "Donate",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
                         }
                     }
                 }
@@ -295,6 +398,28 @@ class MainActivity : ComponentActivity() {
                     prefix = "",
                     unit = "%"
                 )
+
+                // Warning Notice Card below System Volume Slider
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = AmberWarning.copy(alpha = 0.12f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, AmberWarning.copy(alpha = 0.4f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(14.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Text(text = "⚠️", fontSize = 14.sp)
+                        Text(
+                            text = "Warning: Playing audio at high volumes may damage speakers/hearing. ALL USE IS AT YOUR OWN RISK. Particularly beware of boosts above 60%, especially with music.",
+                            fontSize = 11.5.sp,
+                            lineHeight = 16.sp,
+                            color = if (isSystemInDarkTheme()) Color(0xFFFCD34D) else Color(0xFF92400E)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
             }

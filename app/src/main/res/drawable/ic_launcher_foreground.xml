@@ -5,52 +5,53 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Outer Sound Ripple Arc (Right) -->
+    <!-- Outer Thin Purple Ring -->
     <path
-        android:strokeColor="#80D0BCFF"
-        android:strokeWidth="3.2"
-        android:strokeLineCap="round"
-        android:pathData="M73,38 A24,24 0 0,1 73,70" />
+        android:strokeColor="#B36834CD"
+        android:strokeWidth="1.0"
+        android:pathData="M54,54m-39,0a39,39 0,1,1 78,0a39,39 0,1,1 -78,0" />
 
-    <!-- Outer Sound Ripple Arc (Left) -->
+    <!-- Left Lavender Pill Arc Accent -->
     <path
-        android:strokeColor="#80D0BCFF"
-        android:strokeWidth="3.2"
-        android:strokeLineCap="round"
-        android:pathData="M35,38 A24,24 0 0,0 35,70" />
-
-    <!-- Mid Sound Wave Arc (Right) -->
-    <path
-        android:strokeColor="#FFD0BCFF"
+        android:strokeColor="#FFAA80F9"
         android:strokeWidth="3.6"
         android:strokeLineCap="round"
-        android:pathData="M66,43 A16,16 0 0,1 66,65" />
+        android:pathData="M23.3,29.8 A39,39 0 0,0 23.3,78.2" />
 
-    <!-- Mid Sound Wave Arc (Left) -->
+    <!-- Right Lavender Pill Arc Accent -->
     <path
-        android:strokeColor="#FFD0BCFF"
+        android:strokeColor="#FFAA80F9"
         android:strokeWidth="3.6"
         android:strokeLineCap="round"
-        android:pathData="M42,43 A16,16 0 0,0 42,65" />
+        android:pathData="M84.7,29.8 A39,39 0 0,1 84.7,78.2" />
 
-    <!-- Center Soft Glow Circle Pill -->
+    <!-- Inner Deep Purple Disc -->
     <path
-        android:fillColor="#38226B"
-        android:pathData="M54,54m-17,0a17,17 0,1,1 34,0a17,17 0,1,1 -34,0" />
+        android:fillColor="#FF4A18B7"
+        android:strokeColor="#FF6C33E2"
+        android:strokeWidth="3.4"
+        android:pathData="M54,54m-28,0a28,28 0,1,1 56,0a28,28 0,1,1 -56,0" />
 
+    <!-- Yellow Sound Amplifier Speaker Outline -->
     <path
-        android:strokeColor="#6E44BA"
-        android:strokeWidth="1.5"
-        android:pathData="M54,54m-17,0a17,17 0,1,1 34,0a17,17 0,1,1 -34,0" />
+        android:strokeColor="#FFFFE600"
+        android:strokeWidth="3.6"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M33.5,47.5 L41,47.5 L51.5,37 L51.5,71 L41,60.5 L33.5,60.5 Z" />
 
-    <!-- Electric Energy Lightning Symbol (Golden Amber #F59E0B) -->
+    <!-- Yellow Inner Sound Wave Arc -->
     <path
-        android:fillColor="#FFF59E0B"
-        android:pathData="M56.5,37 L45,52.5 L53,52.5 L51.5,71 L63,55.5 L55,55.5 Z" />
+        android:strokeColor="#FFFFE600"
+        android:strokeWidth="3.6"
+        android:strokeLineCap="round"
+        android:pathData="M58,46 A11,11 0 0,1 58,62" />
 
-    <!-- Subtle Inner Highlight on Lightning -->
+    <!-- Yellow Outer Sound Wave Arc -->
     <path
-        android:fillColor="#FFFDE047"
-        android:pathData="M56.5,37 L48.5,52.5 L53.5,52.5 L52.5,64 L59.5,55.5 L55.5,55.5 Z" />
+        android:strokeColor="#FFFFE600"
+        android:strokeWidth="3.6"
+        android:strokeLineCap="round"
+        android:pathData="M66.5,39.5 A19.5,19.5 0 0,1 66.5,68.5" />
 
 </vector>

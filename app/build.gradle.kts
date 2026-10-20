@@ -9,7 +9,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "io.github.kg6k.soundamplifier"
+        applicationId = "io.github.kg6k.soundamplifier.prunsm"
         minSdk = 29 // Android 10.0 (API 29) and above
         targetSdk = 35 // Android 15 (API 35)
         versionCode = 3

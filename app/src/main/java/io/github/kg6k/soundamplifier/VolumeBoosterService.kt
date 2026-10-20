@@ -164,12 +164,12 @@ class VolumeBoosterService : Service() {
 
     /**
      * Real Audible Gain Mapping:
-     * 100% boost -> 4000 millibels (+40 dB)
-     * 50% boost  -> 2000 millibels (+20 dB)
-     * 25% boost  -> 1000 millibels (+10 dB)
+     * 100% boost -> 6000 millibels (+60 dB)
+     * 50% boost  -> 3000 millibels (+30 dB)
+     * 25% boost  -> 1500 millibels (+15 dB)
      */
     private fun applyLoudnessGain(percent: Int) {
-        val millibels = (percent * 40).coerceIn(0, 4000)
+        val millibels = (percent * 60).coerceIn(0, 6000)
 
         // 1. Apply to global session 0
         try {
@@ -291,28 +291,6 @@ class VolumeBoosterService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Step down -20%
-        val stepDownIntent = PendingIntent.getService(
-            this,
-            1,
-            Intent(this, VolumeBoosterService::class.java).apply {
-                action = ACTION_STEP_BOOST
-                putExtra(EXTRA_STEP, -20)
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // Step up +20%
-        val stepUpIntent = PendingIntent.getService(
-            this,
-            2,
-            Intent(this, VolumeBoosterService::class.java).apply {
-                action = ACTION_STEP_BOOST
-                putExtra(EXTRA_STEP, 20)
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
         // Turn off / Reset to 0%
         val stopIntent = PendingIntent.getService(
             this,
@@ -323,11 +301,10 @@ class VolumeBoosterService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val dbGain = String.format("+%.1f dB", (percent * 40) / 100f)
+        val dbGain = String.format("+%.1f dB", (percent * 60) / 100f)
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Sound Amplifier: +$percent% ($dbGain)")
-            .setContentText("Active background volume boost • Tap to adjust")
             .setSmallIcon(R.drawable.ic_qs_volume_boost)
             .setColor(Color.parseColor("#6750A4"))
             .setContentIntent(pendingOpenApp)

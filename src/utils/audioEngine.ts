@@ -75,13 +75,15 @@ export class AudioEngine {
 
   public setBoost(pct: number, enabled: boolean) {
     this.initContext();
-    this.boostLevel = Math.max(0, Math.min(100, pct)) / 100; // 0 to 1.0 (representing +0% to +100%)
+    this.boostLevel = Math.max(0, Math.min(100, pct)) / 100; // 0 to 1.0 (representing 0% to 100%)
     this.isBoostEnabled = enabled;
 
     if (this.ctx && this.boostGain) {
-      // 0% boost = gain multiplier 1.0
-      // 100% boost = gain multiplier 2.0 (+100% loudness enhancement)
-      const targetGain = enabled ? 1.0 + this.boostLevel : 1.0;
+      // 0% boost = 0 dB (gain multiplier 1.0)
+      // 100% boost = +60 dB (gain multiplier 10^(60/20))
+      // Protected by dynamics compressor safety limiter
+      const db = (this.boostLevel * 60);
+      const targetGain = enabled && this.boostLevel > 0 ? Math.pow(10, db / 20) : 1.0;
       this.boostGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.05);
     }
   }
@@ -91,8 +93,6 @@ export class AudioEngine {
     this.isLimiterEnabled = enabled;
     this.updateLimiterRouting();
   }
-
-
 }
 
 export const audioEngine = new AudioEngine();
