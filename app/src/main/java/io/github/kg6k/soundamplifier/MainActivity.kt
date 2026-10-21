@@ -458,26 +458,21 @@ class MainActivity : ComponentActivity() {
                     unit = "%"
                 )
 
-                // Warning Notice Card below System Volume Slider
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = RedDanger.copy(alpha = 0.12f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, RedDanger.copy(alpha = 0.4f)),
-                    modifier = Modifier.fillMaxWidth()
+                // Warning Notice below System Volume Slider (Text & Symbol only, no box)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Row(
-                        modifier = Modifier.padding(14.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Text(text = "⚠️", fontSize = 14.sp)
-                        Text(
-                            text = "Warning: Playing audio at high volumes may damage speakers/hearing. ALL USE IS AT YOUR OWN RISK. Particularly beware of boosts above 60%, especially with music.",
-                            fontSize = 11.5.sp,
-                            lineHeight = 16.sp,
-                            color = if (isSystemInDarkTheme()) Color(0xFFFCD34D) else Color(0xFF92400E)
-                        )
-                    }
+                    Text(text = "⚠️", fontSize = 14.sp)
+                    Text(
+                        text = "Warning: Playing audio at high volumes may damage speakers/hearing. ALL USE IS AT YOUR OWN RISK. Particularly beware of boosts above 60%, especially with music.",
+                        fontSize = 11.5.sp,
+                        lineHeight = 16.sp,
+                        color = if (isSystemInDarkTheme()) Color(0xFFFCD34D) else Color(0xFF92400E)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

@@ -136,16 +136,10 @@ export default function App() {
           onChange={handleSystemVolumeChange}
         />
 
-        {/* Warning text below system volume slider */}
-        <div
-          className="w-full p-3.5 rounded-2xl border flex items-start gap-3 mt-1.5 transition-colors"
-          style={{
-            backgroundColor: isDark ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2',
-            borderColor: isDark ? 'rgba(239, 68, 68, 0.4)' : '#FCA5A5',
-          }}
-        >
+        {/* Warning text below system volume slider (seamless, no box) */}
+        <div className="w-full flex items-start gap-2.5 px-1 py-1 mt-1">
           <div className="mt-0.5 shrink-0 text-red-500">
-            <AlertTriangle size={17} />
+            <AlertTriangle size={16} />
           </div>
           <p
             className="text-[11.5px] leading-relaxed font-normal"
