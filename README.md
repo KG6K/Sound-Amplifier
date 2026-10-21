@@ -9,3 +9,7 @@ An open-source, copylefted Sound Amplifier for Android.
 - **Quick Settings Tile**: Fast one-tap toggle and real-time percentage subtitle in the notification shade via `TileService`.
 - **Dynamic Safety Limiter**: Prevents harsh clipping distortion and protects device speakers.
 - **Android 10+ Compatible**: Designed for `minSdk = 29` (Android 10) through `targetSdk = 35` (Android 15).
+
+## Built With
+
+This app was built using Google AI Studio.
