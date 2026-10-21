@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Heart, X } from 'lucide-react';
+import { AlertTriangle, Heart, X, ExternalLink, Github, Zap } from 'lucide-react';
 import { audioEngine } from './utils/audioEngine';
 import { MaterialSlider } from './components/MaterialSlider';
 
@@ -75,7 +75,13 @@ export default function App() {
               </h1>
               <p className="text-xs font-medium" style={{ color: textSubColor }}>
                 {isBoostActive ? (
-                  <span className="text-amber-500 font-semibold">
+                  <span
+                    className={
+                      boostPercentage > 60
+                        ? 'text-red-500 font-bold'
+                        : 'text-emerald-500 font-semibold'
+                    }
+                  >
                     Amplification active (+{dbGain} dB)
                   </span>
                 ) : (
@@ -173,19 +179,49 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowDonateDialog(false)}
-                className="p-1 rounded-full text-zinc-400 hover:text-zinc-200 transition"
+                className="p-1 rounded-full text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
-            <p className="text-xs leading-relaxed mb-5" style={{ color: textSubColor }}>
-              Thank you for wanting to support Sound Amplifier! Donation options and links will be configured here.
+
+            <p className="text-xs leading-relaxed mb-4 font-medium" style={{ color: textSubColor }}>
+              An open-source, copylefted Sound Amplifier for Android.
             </p>
+
+            <div className="space-y-2 mb-4">
+              {/* Direct UPI App Payment Link */}
+              <a
+                href="upi://pay?pa=ansariusman@ptyes&pn=MOHAMAD%20U%20ANSHARI"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white shadow-sm transition active:scale-95 cursor-pointer text-center"
+              >
+                <Zap size={14} className="fill-current text-amber-300" />
+                <span>Donate by UPI</span>
+              </a>
+
+              {/* GitHub Source Code Repo Link */}
+              <a
+                href="https://github.com/KG6K/Sound-Amplifier"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold border transition active:scale-95 cursor-pointer text-center"
+                style={{
+                  backgroundColor: isDark ? '#26242E' : '#F1F5F9',
+                  borderColor: isDark ? '#3D3A47' : '#CBD5E1',
+                  color: textTitleColor,
+                }}
+              >
+                <Github size={14} />
+                <span>GitHub Source Code</span>
+                <ExternalLink size={12} className="opacity-60 ml-0.5" />
+              </a>
+            </div>
+
             <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowDonateDialog(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white active:scale-95 transition"
+                className="px-4 py-1.5 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
               >
                 Close
               </button>

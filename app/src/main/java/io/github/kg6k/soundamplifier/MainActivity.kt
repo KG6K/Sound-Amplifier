@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -174,7 +176,10 @@ class MainActivity : ComponentActivity() {
             AlertDialog(
                 onDismissRequest = { showDonateDialog = false },
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(text = "❤️", fontSize = 18.sp)
                         Text(
                             text = "Support Development",
@@ -184,14 +189,64 @@ class MainActivity : ComponentActivity() {
                     }
                 },
                 text = {
-                    Text(
-                        text = "Thank you for wanting to support Sound Amplifier! Donation options and links will be configured here.",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Text(
+                            text = "An open-source, copylefted Sound Amplifier for Android.",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Direct UPI App Payment Action
+                        Button(
+                            onClick = {
+                                val upiUri = Uri.parse("upi://pay?pa=ansariusman@ptyes&pn=MOHAMAD%20U%20ANSHARI")
+                                val upiIntent = Intent(Intent.ACTION_VIEW, upiUri)
+                                try {
+                                    startActivity(upiIntent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "No UPI app found on this device",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = "⚡ Donate by UPI",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp
+                            )
+                        }
+
+                        // GitHub Source Code Repo Button
+                        OutlinedButton(
+                            onClick = {
+                                val repoIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://github.com/KG6K/Sound-Amplifier")
+                                )
+                                startActivity(repoIntent)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = "GitHub Repository",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
                 },
                 confirmButton = {
-                    Button(onClick = { showDonateDialog = false }) {
+                    TextButton(onClick = { showDonateDialog = false }) {
                         Text("Close")
                     }
                 }
@@ -322,7 +377,11 @@ class MainActivity : ComponentActivity() {
                                     "Amplification idle (0%)"
                                 },
                                 fontSize = 11.sp,
-                                color = if (boostPercent > 0) AmberWarning else MaterialTheme.colorScheme.onSurfaceVariant
+                                color = when {
+                                    boostPercent > 60 -> RedDanger
+                                    boostPercent > 0 -> EmeraldSafe
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                }
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))

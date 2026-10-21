@@ -53,8 +53,7 @@ fun MaterialExpressiveSlider(
     val trackColor by animateColorAsState(
         targetValue = when {
             value == 0 -> if (isDark) Color(0xFF64748B) else Color(0xFF94A3B8)
-            isBoostMode && value <= 30 -> EmeraldSafe
-            isBoostMode && value <= 60 -> AmberWarning
+            isBoostMode && value <= 60 -> EmeraldSafe
             isBoostMode -> RedDanger
             else -> colorScheme.primary
         },
