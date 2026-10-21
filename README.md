@@ -1,6 +1,6 @@
 # Sound Amplifier
 
-A lightweight Android volume booster and audio loudness amplifier built with Material 3 principles and Quick Settings Tile support.
+An open-source, copylefted Sound Amplifier for Android.
 
 ## Key Features
 
