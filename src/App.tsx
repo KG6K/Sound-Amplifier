@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Heart, X, ExternalLink, Github, Zap } from 'lucide-react';
+import { AlertTriangle, Heart, ExternalLink, Github, Zap } from 'lucide-react';
 import { audioEngine } from './utils/audioEngine';
 import { MaterialSlider } from './components/MaterialSlider';
 
@@ -140,11 +140,11 @@ export default function App() {
         <div
           className="w-full p-3.5 rounded-2xl border flex items-start gap-3 mt-1.5 transition-colors"
           style={{
-            backgroundColor: isDark ? '#23180d' : '#FFFBEB',
-            borderColor: isDark ? '#5C3815' : '#FDE68A',
+            backgroundColor: isDark ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2',
+            borderColor: isDark ? 'rgba(239, 68, 68, 0.4)' : '#FCA5A5',
           }}
         >
-          <div className="mt-0.5 shrink-0 text-amber-500">
+          <div className="mt-0.5 shrink-0 text-red-500">
             <AlertTriangle size={17} />
           </div>
           <p
@@ -169,20 +169,11 @@ export default function App() {
               color: textTitleColor,
             }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
-                  <Heart size={18} className="fill-current" />
-                </div>
-                <h3 className="font-bold text-base">Support Development</h3>
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
+                <Heart size={18} className="fill-current" />
               </div>
-              <button
-                type="button"
-                onClick={() => setShowDonateDialog(false)}
-                className="p-1 rounded-full text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
-              >
-                <X size={18} />
-              </button>
+              <h3 className="font-bold text-base">Support Development</h3>
             </div>
 
             <p className="text-xs leading-relaxed mb-4 font-medium" style={{ color: textSubColor }}>
@@ -221,7 +212,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowDonateDialog(false)}
-                className="px-4 py-1.5 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white shadow-xs transition active:scale-95 cursor-pointer"
               >
                 Close
               </button>

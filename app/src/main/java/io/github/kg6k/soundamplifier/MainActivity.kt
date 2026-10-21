@@ -461,8 +461,8 @@ class MainActivity : ComponentActivity() {
                 // Warning Notice Card below System Volume Slider
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = AmberWarning.copy(alpha = 0.12f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, AmberWarning.copy(alpha = 0.4f)),
+                    color = RedDanger.copy(alpha = 0.12f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, RedDanger.copy(alpha = 0.4f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(

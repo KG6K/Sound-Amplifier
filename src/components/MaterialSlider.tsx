@@ -144,12 +144,11 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
 
         {/* Fixed-dimension Stable Value Display (Does not jitter or resize) */}
         <div
-          className="w-14 h-6 px-1 rounded-lg flex items-center justify-center font-mono border tabular-nums shrink-0 transition-all duration-150"
+          className="w-14 h-6 px-1 rounded-lg flex items-center justify-center font-mono border tabular-nums shrink-0 transition-colors duration-150"
           style={{
             backgroundColor: isBoostMode && value > 60 ? (isDark ? '#ef444426' : '#fee2e2') : `${trackColor}18`,
             borderColor: isBoostMode && value > 60 ? '#ef4444' : `${trackColor}40`,
             color: isBoostMode && value > 60 ? '#ef4444' : trackColor,
-            boxShadow: isBoostMode && value > 60 ? '0 0 8px rgba(239, 68, 68, 0.25)' : 'none',
           }}
         >
           <span className={`text-sm font-bold text-center inline-flex items-baseline ${isBoostMode && value > 60 ? 'text-red-500 font-extrabold' : ''}`}>
@@ -186,17 +185,16 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
             style={{
               width: `${percent}%`,
               backgroundColor: isBoostMode && value > 60 ? '#ef4444' : trackColor,
-              boxShadow: isBoostMode && value > 60 ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none',
             }}
           />
 
           {/* Smooth Circular Elevated Thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-full bg-white shadow-sm cursor-grab active:cursor-grabbing active:scale-110 transition-transform"
+            className="absolute top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-full bg-white shadow-xs cursor-grab active:cursor-grabbing active:scale-110 transition-transform"
             style={{
               left: `calc(${percent}% - 9px)`,
               border: `2.5px solid ${isBoostMode && value > 60 ? '#ef4444' : trackColor}`,
-              boxShadow: isBoostMode && value > 60 ? '0 0 10px rgba(239, 68, 68, 0.6)' : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.15)',
             }}
           />
         </div>
