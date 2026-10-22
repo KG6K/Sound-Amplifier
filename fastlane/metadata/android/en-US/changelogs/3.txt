@@ -1,0 +1,6 @@
+• Support Android 6.0 Marshmallow (API 23) through Android 15 (API 35)
+• +60 dB loudness boost amplification via LoudnessEnhancer
+• Quick Settings Tile with real-time amplification status
+• Visual danger indicator (green up to 60%, red above 60%)
+• Safety volume limiter and speaker protection notices
+• Open-source under GNU General Public License v3.0 (GPL-3.0)

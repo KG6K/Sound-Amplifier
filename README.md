@@ -13,3 +13,11 @@ An open-source, copylefted Sound Amplifier for Android.
 ## Built With
 
 This app was built using Google AI Studio.
+
+## License
+
+Sound Amplifier is licensed under the [GNU General Public License v3.0](LICENSE) (GPL-3.0).
+
+## F-Droid Release
+
+Instructions for submitting and maintaining the app on the official F-Droid repository are documented in the [F-Droid Release Guide](FDROID_RELEASE_GUIDE.md).

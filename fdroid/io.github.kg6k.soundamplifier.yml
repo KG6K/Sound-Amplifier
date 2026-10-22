@@ -1,0 +1,46 @@
+Categories:
+  - Audio
+  - System
+License: GPL-3.0-or-later
+AuthorName: KG6K
+AuthorEmail: nashiqueansari24@gmail.com
+WebSite: https://github.com/KG6K/Sound-Amplifier
+SourceCode: https://github.com/KG6K/Sound-Amplifier
+IssueTracker: https://github.com/KG6K/Sound-Amplifier/issues
+Donate: upi://pay?pa=ansariusman@ptyes&pn=MOHAMAD%20U%20ANSHARI
+
+AutoName: Sound Amplifier
+Summary: Open-source, copylefted Sound Amplifier and loudness booster for Android.
+Description: |-
+  Sound Amplifier is an open-source, copylefted audio loudness booster and sound
+  enhancer designed for Android.
+
+  Key Features:
+  * Intuitive Boost Slider: Amplifies media volume past normal speaker limits up
+    to +60 dB using Android's native LoudnessEnhancer audio effects engine.
+  * Background Foreground Service: Continues running smoothly across music streaming,
+    podcasts, audiobooks, and video games.
+  * Quick Settings Tile: Toggle amplification with a single tap directly from your
+    Android notification shade (Android 7.0+).
+  * Safety Limiter: Visual color transitions (green up to 60%, red above 60%) and
+    dynamic warning notices to protect your device speakers and hearing.
+  * Broad Android Compatibility: Fully supports Android 6.0 Marshmallow (API 23)
+    through Android 15 (API 35).
+  * 100% Free & Open Source: No advertisements, no trackers, and zero proprietary
+    dependencies.
+
+RepoType: git
+Repo: https://github.com/KG6K/Sound-Amplifier.git
+
+Builds:
+  - versionName: 1.0.0-alpha2
+    versionCode: 3
+    commit: v1.0.0-alpha2
+    subdir: app
+    gradle:
+      - assembleRelease
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.0-alpha2
+CurrentVersionCode: 3

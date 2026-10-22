@@ -1,0 +1,1 @@
+Open-source, copylefted Sound Amplifier and loudness booster for Android.
