@@ -1,0 +1,6 @@
+• Official stable release v1.0.1
+• Native +60 dB media loudness boost via Android LoudnessEnhancer
+• Support for Android 6.0 Marshmallow (API 23) through Android 15 (API 35)
+• Quick Settings Tile toggle with real-time amplification status
+• Visual safety limiter with dynamic warning indicators
+• Licensed under GNU General Public License v3.0 (GPL-3.0)

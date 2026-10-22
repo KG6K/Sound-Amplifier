@@ -32,37 +32,37 @@ jobs:
       - name: Prepare APK for Release
         run: |
           mkdir -p release-output
-          cp app/build/outputs/apk/release/*.apk release-output/SoundAmplifier-v1.0.0-alpha2.apk
+          TAG_NAME="${GITHUB_REF_NAME:-v1.0.1}"
+          cp app/build/outputs/apk/release/*.apk "release-output/SoundAmplifier-${TAG_NAME}.apk"
           ls -la release-output/
 
       - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: SoundAmplifier-Alpha-APK
-          path: release-output/SoundAmplifier-v1.0.0-alpha2.apk
+          name: SoundAmplifier-Release-APK
+          path: release-output/*.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name || 'v1.0.0-alpha2' }}
-          name: Sound Amplifier v1.0.0-alpha2 (Alpha Build)
+          tag_name: ${{ github.ref_name }}
+          name: Sound Amplifier ${{ github.ref_name }}
           body: |
-            ## Sound Amplifier v1.0.0-alpha2 (Alpha Build)
+            ## Sound Amplifier ${{ github.ref_name }} — Official Stable Release
 
             ### Download:
-            - **`SoundAmplifier-v1.0.0-alpha2.apk`**: Universal APK optimized with R8 shrinking (~5–7 MB, compatible with all Android devices).
+            - **`SoundAmplifier-${{ github.ref_name }}.apk`**: Official signed Android APK release (compatible with Android 6.0 Marshmallow through Android 15).
 
-            ### Highlights & What's New in Alpha 2:
-            - **R8 Full Shrinking & Optimization**: High-performance minified binary (~70% smaller) via R8 dead code and unused resource stripping.
-            - **Sleek Symmetrical Design**: Removed redundant preset chips and status badges for a unified, clean tactile look.
-            - **Balanced Division Sizing**: Perfectly symmetrical, compact divisions for Boost Amplification and System Media Volume.
-            - **Audio Speaker Iconography**: Replaced lightning zap with modern audio speaker and sound waves.
-            - **Android 14 & 15 Stability**: Safe broadcast receiver exports (`RECEIVER_EXPORTED`) for audio session hooking on Android 14/15.
-            - **Foreground Service & Quick Actions**: Foreground service with ongoing notification status, +40 dB loudness enhancement, and Quick Settings tile.
-            - **Crash Reporting & Diagnostics**: Built-in crash logging saved to device storage (`Android/data/io.github.kg6k.soundamplifier/files/crash_reports/`).
-            - **Compatibility**: Android 10 (API 29) through Android 15 (API 35) support.
-          files: release-output/SoundAmplifier-v1.0.0-alpha2.apk
+            ### Highlights & Key Features:
+            - **Native Audio Loudness Boost**: Enhances media volume up to +60 dB using Android's native `LoudnessEnhancer` audio effects engine across all music, podcasts, and video players.
+            - **Android 6.0 to 15 Compatibility**: Backward-compatible with Android 6.0 Marshmallow (`minSdk = 23`) through Android 15 (`targetSdk = 35`).
+            - **Quick Settings Tile**: Fast one-tap toggle with real-time amplification status in the notification shade (Android 7.0+).
+            - **Visual Safety Limiter**: Dynamic slider color transitions (emerald green $\le$ 60%, bright red $>$ 60%) to prevent hearing damage and speaker blowouts.
+            - **Permanent Release Signature**: Signed with official keystore certificate for seamless future app updates.
+            - **100% Free & Open Source**: Licensed under GNU General Public License v3.0 (GPL-3.0), zero trackers, zero ads, and zero proprietary blobs.
+            - **F-Droid Ready**: Complete Fastlane metadata and F-Droid build recipe included.
+          files: release-output/*.apk
           draft: false
-          prerelease: true
+          prerelease: false
