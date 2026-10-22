@@ -5,10 +5,12 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.util.Log
+import androidx.annotation.RequiresApi
 
 /**
- * Crash-safe Android Quick Settings TileService
+ * Crash-safe Android Quick Settings TileService (Android 7.0+ / API 24+)
  */
+@RequiresApi(Build.VERSION_CODES.N)
 class VolumeBoosterTileService : TileService() {
 
     private val TAG = "VolumeBoosterTile"
