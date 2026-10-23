@@ -1,0 +1,5 @@
+• Restored standard package identifier (io.github.kg6k.soundamplifier)
+• Scaled adaptive launcher icon within the 66dp safe zone to eliminate edge cropping across all device launchers
+• Added seamless full-canvas radial dark background for adaptive icons
+• Compacted Support Development Material 3 dialog height and vertical spacing
+• Aligned UI preview and slider thumb bounds 1:1 with Android Compose

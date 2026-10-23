@@ -32,7 +32,7 @@ jobs:
       - name: Prepare APK for Release
         run: |
           mkdir -p release-output
-          TAG_NAME="${GITHUB_REF_NAME:-v1.0.1}"
+          TAG_NAME="${GITHUB_REF_NAME:-v1.0.2}"
           cp app/build/outputs/apk/release/*.apk "release-output/SoundAmplifier-${TAG_NAME}.apk"
           ls -la release-output/
 

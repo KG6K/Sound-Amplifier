@@ -12,8 +12,8 @@ android {
         applicationId = "io.github.kg6k.soundamplifier"
         minSdk = 23 // Android 6.0 (API 23) and above
         targetSdk = 35 // Android 15 (API 35)
-        versionCode = 4
-        versionName = "1.0.1"
+        versionCode = 5
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
