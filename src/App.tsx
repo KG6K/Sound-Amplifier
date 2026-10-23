@@ -152,7 +152,7 @@ export default function App() {
       {showDonateDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
           <div
-            className="w-full max-w-[320px] sm:max-w-sm rounded-[28px] p-6 shadow-2xl transition-all"
+            className="w-full max-w-[310px] sm:max-w-xs rounded-[24px] p-5 shadow-2xl transition-all"
             style={{
               backgroundColor: isDark ? '#2B2930' : '#ECE6F0',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.08)',
@@ -160,10 +160,10 @@ export default function App() {
             }}
           >
             {/* Title Row */}
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg select-none">❤️</span>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-base select-none">❤️</span>
               <h3
-                className="font-bold text-lg tracking-tight"
+                className="font-bold text-base tracking-tight"
                 style={{ color: isDark ? '#E6E1E5' : '#1D1B20' }}
               >
                 Support Development
@@ -172,18 +172,18 @@ export default function App() {
 
             {/* Content Text */}
             <p
-              className="text-[13px] leading-relaxed mb-4 font-normal"
+              className="text-[12px] leading-snug mb-3 font-normal"
               style={{ color: isDark ? '#CAC4D0' : '#49454F' }}
             >
               An open-source, copylefted Sound Amplifier for Android.
             </p>
 
             {/* Action Buttons Column */}
-            <div className="space-y-3 mb-5">
+            <div className="space-y-2 mb-3">
               {/* Material 3 Primary Filled Button */}
               <a
                 href="upi://pay?pa=ansariusman@ptyes&pn=MOHAMAD%20U%20ANSHARI"
-                className="w-full h-10 flex items-center justify-center gap-1.5 rounded-xl text-[13px] font-semibold transition active:scale-98 cursor-pointer text-center select-none shadow-xs"
+                className="w-full h-9 flex items-center justify-center gap-1.5 rounded-lg text-xs font-semibold transition active:scale-98 cursor-pointer text-center select-none shadow-xs"
                 style={{
                   backgroundColor: isDark ? '#D0BCFF' : '#6750A4',
                   color: isDark ? '#381E72' : '#FFFFFF',
@@ -197,7 +197,7 @@ export default function App() {
                 href="https://github.com/KG6K/Sound-Amplifier"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full h-10 flex items-center justify-center gap-1.5 rounded-xl text-[13px] font-semibold transition active:scale-98 cursor-pointer text-center select-none"
+                className="w-full h-9 flex items-center justify-center gap-1.5 rounded-lg text-xs font-semibold transition active:scale-98 cursor-pointer text-center select-none"
                 style={{
                   backgroundColor: 'transparent',
                   border: isDark ? '1px solid #938F99' : '1px solid #79747E',
@@ -213,7 +213,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowDonateDialog(false)}
-                className="px-4 py-2 rounded-full text-sm font-semibold transition cursor-pointer select-none"
+                className="px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer select-none"
                 style={{
                   color: isDark ? '#D0BCFF' : '#6750A4',
                   backgroundColor: 'transparent',

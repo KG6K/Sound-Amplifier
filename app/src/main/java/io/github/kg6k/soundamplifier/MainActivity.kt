@@ -191,11 +191,11 @@ class MainActivity : ComponentActivity() {
                 text = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
                             text = "An open-source, copylefted Sound Amplifier for Android.",
-                            fontSize = 13.sp,
+                            fontSize = 12.5.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -215,13 +215,16 @@ class MainActivity : ComponentActivity() {
                                     ).show()
                                 }
                             },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(38.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(vertical = 0.dp)
                         ) {
                             Text(
                                 text = "⚡ Donate by UPI",
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 13.sp
+                                fontSize = 12.5.sp
                             )
                         }
 
@@ -234,13 +237,16 @@ class MainActivity : ComponentActivity() {
                                 )
                                 startActivity(repoIntent)
                             },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(38.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(vertical = 0.dp)
                         ) {
                             Text(
                                 text = "GitHub Repository",
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 13.sp
+                                fontSize = 12.5.sp
                             )
                         }
                     }
