@@ -33,3 +33,4 @@ local.properties
 *.iml
 
 .aistudio/
+public/assets/

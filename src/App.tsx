@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Heart, ExternalLink, Github, Zap } from 'lucide-react';
+import { Heart, ExternalLink, Github, Zap } from 'lucide-react';
 import { audioEngine } from './utils/audioEngine';
 import { MaterialSlider } from './components/MaterialSlider';
 
@@ -44,10 +44,10 @@ export default function App() {
 
   const isBoostActive = boostPercentage > 0;
   // Maximum boost amplification is 60 dB
-  const dbGain = ((boostPercentage * 60) / 100).toFixed(1);
+  const dbGain = Math.round((boostPercentage * 60) / 100);
 
   const bgColor = isDark ? '#141218' : '#F8F9FA';
-  const textTitleColor = isDark ? '#E3E2E6' : '#0F172A';
+  const textTitleColor = isDark ? '#E6E1E5' : '#0F172A';
   const textSubColor = isDark ? '#938F99' : '#64748B';
 
   return (
@@ -59,7 +59,7 @@ export default function App() {
         {/* App Header Bar with App Icon, Title, Active dB, and Donate Button in Top Right Corner */}
         <div className="flex items-center justify-between py-2 px-1">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-sm shrink-0 bg-[#0a0812] border border-[#6834cd]/40">
+            <div className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-xs shrink-0 bg-[#0c0a14] border border-[#6834cd]/50">
               <img
                 src="/app_icon.svg"
                 alt="Sound Amplifier Icon"
@@ -73,13 +73,13 @@ export default function App() {
               >
                 Sound Amplifier
               </h1>
-              <p className="text-xs font-medium" style={{ color: textSubColor }}>
+              <p className="text-[11px] font-medium" style={{ color: textSubColor }}>
                 {isBoostActive ? (
                   <span
                     className={
                       boostPercentage > 60
-                        ? 'text-red-500 font-bold'
-                        : 'text-emerald-500 font-semibold'
+                        ? 'text-[#EF4444] font-bold'
+                        : 'text-[#10B981] font-semibold'
                     }
                   >
                     Amplification active (+{dbGain} dB)
@@ -95,14 +95,13 @@ export default function App() {
           <button
             type="button"
             onClick={() => setShowDonateDialog(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 active:scale-95 shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 active:scale-95 cursor-pointer shrink-0"
             style={{
-              backgroundColor: isDark ? '#2E1C4D' : '#EDE7F6',
-              color: isDark ? '#D0BCFF' : '#5E35B1',
-              border: isDark ? '1px solid #5C3A9C' : '1px solid #D1C4E9',
+              backgroundColor: isDark ? '#4A4458' : '#EDE7F6',
+              color: isDark ? '#E8DEF8' : '#5E35B1',
             }}
           >
-            <Heart size={13} className="fill-rose-500 text-rose-500" />
+            <span className="text-xs">❤️</span>
             <span>Donate</span>
           </button>
         </div>
@@ -136,11 +135,9 @@ export default function App() {
           onChange={handleSystemVolumeChange}
         />
 
-        {/* Warning text below system volume slider (seamless, no box) */}
-        <div className="w-full flex items-start gap-2.5 px-1 py-1 mt-1">
-          <div className="mt-0.5 shrink-0 text-red-500">
-            <AlertTriangle size={16} />
-          </div>
+        {/* Warning text below system volume slider (matching Android Compose) */}
+        <div className="w-full flex items-start gap-2 px-1 py-1 mt-1">
+          <span className="text-sm select-none shrink-0 leading-tight">⚠️</span>
           <p
             className="text-[11.5px] leading-relaxed font-normal"
             style={{

@@ -48,11 +48,11 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
 
   if (isBoostMode) {
     if (value === 0) {
-      trackColor = isDark ? '#64748b' : '#94a3b8';
+      trackColor = isDark ? '#64748B' : '#94A3B8';
     } else if (value <= 60) {
-      trackColor = '#10b981'; // Green before 60%
+      trackColor = '#10B981'; // EmeraldSafe
     } else {
-      trackColor = '#ef4444'; // Red after 60%
+      trackColor = '#EF4444'; // RedDanger
     }
   }
 
@@ -117,8 +117,10 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
   const cardBg = isDark ? '#211F26' : '#FFFFFF';
   const cardBorder = isDark ? '#33303D' : '#E2E8F0';
   const trackInactive = isDark ? '#262A36' : '#E2E8F0';
-  const textTitle = isDark ? '#E3E2E6' : '#0F172A';
+  const textTitle = isDark ? '#E6E1E5' : '#0F172A';
   const textSub = isDark ? '#938F99' : '#64748B';
+
+  const fraction = (percent / 100);
 
   return (
     <div
@@ -142,16 +144,16 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
           </span>
         </div>
 
-        {/* Fixed-dimension Stable Value Display (Does not jitter or resize) */}
+        {/* Fixed-dimension Stable Value Display (56px x 24px) */}
         <div
           className="w-14 h-6 px-1 rounded-lg flex items-center justify-center font-mono border tabular-nums shrink-0 transition-colors duration-150"
           style={{
-            backgroundColor: isBoostMode && value > 60 ? (isDark ? '#ef444426' : '#fee2e2') : `${trackColor}18`,
-            borderColor: isBoostMode && value > 60 ? '#ef4444' : `${trackColor}40`,
-            color: isBoostMode && value > 60 ? '#ef4444' : trackColor,
+            backgroundColor: isBoostMode && value > 60 ? (isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2') : `${trackColor}26`,
+            borderColor: isBoostMode && value > 60 ? 'rgba(239, 68, 68, 0.4)' : `${trackColor}40`,
+            color: isBoostMode && value > 60 ? '#EF4444' : trackColor,
           }}
         >
-          <span className={`text-sm font-bold text-center inline-flex items-baseline ${isBoostMode && value > 60 ? 'text-red-500 font-extrabold' : ''}`}>
+          <span className="text-sm font-bold text-center inline-flex items-baseline">
             {prefix}
             {value}
             <span className="text-[10px] font-bold ml-0.5">{unit}</span>
@@ -165,36 +167,36 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
         </p>
       )}
 
-      {/* Compact Line Slider Track */}
+      {/* Modern Line Slider Track & Constrained Round Thumb */}
       <div className="relative py-1 select-none">
         <div
           ref={trackRef}
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
-          className="relative w-full h-6 flex items-center cursor-pointer touch-none"
+          className="relative w-full h-7 flex items-center cursor-pointer touch-none"
         >
-          {/* Inactive Track Line */}
+          {/* Inactive Background Track Line (6px height) */}
           <div
             className="w-full h-1.5 rounded-full"
             style={{ backgroundColor: trackInactive }}
           />
 
-          {/* Active Filled Line */}
+          {/* Active Filled Track Line */}
           <div
             className="absolute left-0 h-1.5 rounded-full transition-all duration-75"
             style={{
               width: `${percent}%`,
-              backgroundColor: isBoostMode && value > 60 ? '#ef4444' : trackColor,
+              backgroundColor: isBoostMode && value > 60 ? '#EF4444' : trackColor,
             }}
           />
 
-          {/* Smooth Circular Elevated Thumb */}
+          {/* Smooth Circular Elevated Thumb (18px diameter, perfectly bounded inside track) */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-full bg-white shadow-xs cursor-grab active:cursor-grabbing active:scale-110 transition-transform"
+            className="absolute top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-full bg-white cursor-grab active:cursor-grabbing active:scale-110 transition-transform"
             style={{
-              left: `calc(${percent}% - 9px)`,
-              border: `2.5px solid ${isBoostMode && value > 60 ? '#ef4444' : trackColor}`,
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.15)',
+              left: `calc(${fraction} * (100% - 18px))`,
+              border: `2.5px solid ${isBoostMode && value > 60 ? '#EF4444' : trackColor}`,
+              boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.35)',
             }}
           />
         </div>
