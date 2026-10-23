@@ -11,6 +11,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +23,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -29,6 +33,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.view.WindowCompat
 import io.github.kg6k.soundamplifier.data.BoosterPreferences
 import io.github.kg6k.soundamplifier.data.CrashReporter
@@ -173,90 +178,128 @@ class MainActivity : ComponentActivity() {
         var showDonateDialog by remember { mutableStateOf(false) }
 
         if (showDonateDialog) {
-            AlertDialog(
-                onDismissRequest = { showDonateDialog = false },
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(text = "❤️", fontSize = 18.sp)
-                        Text(
-                            text = "Support Development",
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                text = {
+            Dialog(onDismissRequest = { showDonateDialog = false }) {
+                val isDark = isSystemInDarkTheme()
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(22.dp),
+                    color = if (isDark) Color(0xFF2B2930) else Color(0xFFECE6F0),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
+                    )
+                ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 10.dp)
                     ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(text = "❤️", fontSize = 15.sp)
+                            Text(
+                                text = "Support Development",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
                         Text(
                             text = "An open-source, copylefted Sound Amplifier for Android.",
-                            fontSize = 12.5.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                            fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        // Direct UPI App Payment Action
-                        Button(
-                            onClick = {
-                                val upiUri = Uri.parse("upi://pay?pa=ansariusman@ptyes&pn=MOHAMAD%20U%20ANSHARI")
-                                val upiIntent = Intent(Intent.ACTION_VIEW, upiUri)
-                                try {
-                                    startActivity(upiIntent)
-                                } catch (e: Exception) {
-                                    Toast.makeText(
-                                        this@MainActivity,
-                                        "No UPI app found on this device",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            },
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Direct UPI App Payment Action (36dp height without M3 48dp minimum touch target bloat)
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(38.dp),
-                            shape = RoundedCornerShape(10.dp),
-                            contentPadding = PaddingValues(vertical = 0.dp)
+                                .height(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.primary)
+                                .clickable {
+                                    val upiUri = Uri.parse("upi://pay?pa=ansariusman@ptyes&pn=MOHAMAD%20U%20ANSHARI")
+                                    val upiIntent = Intent(Intent.ACTION_VIEW, upiUri)
+                                    try {
+                                        startActivity(upiIntent)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "No UPI app found on this device",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "⚡ Donate by UPI",
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 12.5.sp
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
 
-                        // GitHub Source Code Repo Button
-                        OutlinedButton(
-                            onClick = {
-                                val repoIntent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://github.com/KG6K/Sound-Amplifier")
-                                )
-                                startActivity(repoIntent)
-                            },
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        // GitHub Source Code Repo Button (36dp height without M3 48dp minimum touch target bloat)
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(38.dp),
-                            shape = RoundedCornerShape(10.dp),
-                            contentPadding = PaddingValues(vertical = 0.dp)
+                                .height(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(10.dp))
+                                .clickable {
+                                    val repoIntent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse("https://github.com/KG6K/Sound-Amplifier")
+                                    )
+                                    startActivity(repoIntent)
+                                },
+                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "GitHub Repository",
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 12.5.sp
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showDonateDialog = false }) {
-                        Text("Close")
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        // Compact Close Action (28dp height, right-aligned)
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .clickable { showDonateDialog = false }
+                                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Close",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                     }
                 }
-            )
+            }
         }
 
         Scaffold(
