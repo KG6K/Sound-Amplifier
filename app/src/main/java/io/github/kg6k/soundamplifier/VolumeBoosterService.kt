@@ -67,30 +67,32 @@ class VolumeBoosterService : Service() {
         const val EXTRA_PERCENT = "percent"
         const val EXTRA_STEP = "step"
 
-        fun setBoost(context: Context, percent: Int) {
+        fun setBoost(context: Context, percent: Int): Boolean {
             val intent = Intent(context, VolumeBoosterService::class.java).apply {
                 action = ACTION_SET_PERCENT
                 putExtra(EXTRA_PERCENT, percent)
             }
-            dispatchServiceIntent(context, intent)
+            return dispatchServiceIntent(context, intent)
         }
 
-        fun stopService(context: Context) {
+        fun stopService(context: Context): Boolean {
             val intent = Intent(context, VolumeBoosterService::class.java).apply {
                 action = ACTION_STOP
             }
-            dispatchServiceIntent(context, intent)
+            return dispatchServiceIntent(context, intent)
         }
 
-        private fun dispatchServiceIntent(context: Context, intent: Intent) {
-            try {
+        private fun dispatchServiceIntent(context: Context, intent: Intent): Boolean {
+            return try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent)
                 } else {
                     context.startService(intent)
                 }
+                true
             } catch (t: Throwable) {
                 Log.e("VolumeBoosterService", "Error dispatching service intent", t)
+                false
             }
         }
     }
@@ -146,10 +148,22 @@ class VolumeBoosterService : Service() {
     private fun applyAndSaveBoost(percent: Int) {
         currentBoostPercent = percent
         val prefs = getSharedPreferences("sound_amplifier_prefs", MODE_PRIVATE)
-        prefs.edit()
+        val editor = prefs.edit()
             .putInt("boost_percent", percent)
             .putBoolean("is_boost_active", percent > 0)
-            .apply()
+        if (percent > 0) {
+            editor.putInt("last_boost_percent", percent)
+        }
+        editor.apply()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                android.service.quicksettings.TileService.requestListeningState(
+                    this,
+                    android.content.ComponentName(this, VolumeBoosterTileService::class.java)
+                )
+            } catch (ignored: Throwable) {}
+        }
 
         if (percent > 0) {
             applyLoudnessGain(percent)

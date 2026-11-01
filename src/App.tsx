@@ -4,9 +4,18 @@ import { MaterialSlider } from './components/MaterialSlider';
 
 export default function App() {
   // Booster State - 0% boost is default/off, >0% is active
+  const BUILD_VERSION_CODE = 5;
   const [boostPercentage, setBoostPercentage] = useState<number>(0);
   const [systemVolume, setSystemVolume] = useState<number>(80);
   const [showDonateDialog, setShowDonateDialog] = useState<boolean>(false);
+  const [showFreeDroidWarn, setShowFreeDroidWarn] = useState<boolean>(() => {
+    try {
+      const saved = parseInt(localStorage.getItem('versionCodeWarn') || '0', 10);
+      return BUILD_VERSION_CODE > saved;
+    } catch {
+      return true;
+    }
+  });
 
   // Automatic System Theme Detection
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -221,6 +230,68 @@ export default function App() {
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FreeDroidWarn (org.woheller69.freeDroidWarn.FreeDroidWarn) Dialog on Install / Upgrade */}
+      {showFreeDroidWarn && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div
+            className="w-full max-w-[330px] rounded-[4px] p-5 shadow-2xl transition-all"
+            style={{
+              backgroundColor: isDark ? '#424242' : '#FFFFFF',
+              color: isDark ? '#FFFFFF' : '#212121',
+            }}
+          >
+            <p className="text-[14px] leading-relaxed mb-5 font-normal">
+              Google has announced that, starting in 2026/2027, all apps on certified Android devices will require the developer to submit personal identity details directly to Google. Since the developers of this app do not agree to this requirement, this app will no longer work on certified Android devices after that time.
+            </p>
+
+            <div className="flex items-center justify-between pt-1">
+              {/* Neutral Button (holo_red_dark) */}
+              <a
+                href="https://github.com/woheller69/FreeDroidWarn?tab=readme-ov-file#solutions"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowFreeDroidWarn(false)}
+                className="px-2 py-1.5 text-[13px] font-medium uppercase tracking-wider cursor-pointer select-none"
+                style={{ color: '#CC0000' }}
+              >
+                Solution
+              </a>
+
+              <div className="flex items-center gap-3">
+                {/* Negative Button */}
+                <a
+                  href="https://keepandroidopen.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShowFreeDroidWarn(false)}
+                  className="px-2 py-1.5 text-[13px] font-medium uppercase tracking-wider cursor-pointer select-none"
+                  style={{ color: isDark ? '#80CBC4' : '#008577' }}
+                >
+                  Details
+                </a>
+
+                {/* Positive Button (OK) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      localStorage.setItem('versionCodeWarn', String(BUILD_VERSION_CODE));
+                    } catch {
+                      // ignore storage error
+                    }
+                    setShowFreeDroidWarn(false);
+                  }}
+                  className="px-2 py-1.5 text-[13px] font-medium uppercase tracking-wider cursor-pointer select-none"
+                  style={{ color: isDark ? '#80CBC4' : '#008577' }}
+                >
+                  OK
+                </button>
+              </div>
             </div>
           </div>
         </div>

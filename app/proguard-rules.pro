@@ -11,3 +11,8 @@
 -keep class android.media.audiofx.** { *; }
 -keepclassmembers class android.media.audiofx.** { *; }
 -dontwarn android.media.audiofx.**
+
+# Keep FreeDroidWarn classes and resources intact
+-keep class org.woheller69.freeDroidWarn.** { *; }
+-keepclassmembers class org.woheller69.freeDroidWarn.** { *; }
+

@@ -39,6 +39,7 @@ import io.github.kg6k.soundamplifier.data.BoosterPreferences
 import io.github.kg6k.soundamplifier.data.CrashReporter
 import io.github.kg6k.soundamplifier.ui.components.MaterialExpressiveSlider
 import io.github.kg6k.soundamplifier.ui.theme.*
+import org.woheller69.freeDroidWarn.FreeDroidWarn
 
 class MainActivity : ComponentActivity() {
 
@@ -46,6 +47,12 @@ class MainActivity : ComponentActivity() {
     private lateinit var audioManager: AudioManager
 
     private val boostPercentState = mutableIntStateOf(0)
+
+    private val prefChangeListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "boost_percent" || key == "is_boost_active") {
+            syncWithPreferences()
+        }
+    }
 
     private val volumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -59,6 +66,8 @@ class MainActivity : ComponentActivity() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         syncWithPreferences()
+        getSharedPreferences("sound_amplifier_prefs", Context.MODE_PRIVATE)
+            .registerOnSharedPreferenceChangeListener(prefChangeListener)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -100,6 +109,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        // Trigger FreeDroidWarn dialog on install (versionCodeWarn defaults to 0) and on version upgrades
+        try {
+            FreeDroidWarn.showWarningOnUpgrade(this, BuildConfig.VERSION_CODE)
+        } catch (ignored: Throwable) {}
     }
 
     override fun onResume() {
@@ -112,6 +126,10 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        try {
+            getSharedPreferences("sound_amplifier_prefs", Context.MODE_PRIVATE)
+                .unregisterOnSharedPreferenceChangeListener(prefChangeListener)
+        } catch (ignored: Throwable) {}
         try {
             unregisterReceiver(volumeReceiver)
         } catch (ignored: Throwable) {}
