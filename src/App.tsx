@@ -4,7 +4,7 @@ import { MaterialSlider } from './components/MaterialSlider';
 
 export default function App() {
   // Booster State - 0% boost is default/off, >0% is active
-  const BUILD_VERSION_CODE = 5;
+  const BUILD_VERSION_CODE = 6;
   const [boostPercentage, setBoostPercentage] = useState<number>(0);
   const [systemVolume, setSystemVolume] = useState<number>(80);
   const [showDonateDialog, setShowDonateDialog] = useState<boolean>(false);

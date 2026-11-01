@@ -1,0 +1,5 @@
+• Integrated FreeDroidWarn (woheller69/FreeDroidWarn) warning dialog on app install and upgrades
+• Updated Quick Settings Tile to open the app on Android 11 and below (or unsupported devices) while toggling boost directly on Android 12+
+• Fixed ForegroundServiceStartNotAllowedException when stopping the amplification service
+• Added live hardware volume key synchronization for the System Media Volume slider
+• Unified +60 dB gain across global and per-app audio sessions with automatic stale session cleanup
