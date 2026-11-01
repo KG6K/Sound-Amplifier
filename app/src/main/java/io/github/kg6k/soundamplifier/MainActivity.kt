@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var audioManager: AudioManager
 
     private val boostPercentState = mutableIntStateOf(0)
+    private val systemVolumeState = mutableIntStateOf(0)
 
     private val prefChangeListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == "boost_percent" || key == "is_boost_active") {
@@ -110,10 +111,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Trigger FreeDroidWarn dialog on install (versionCodeWarn defaults to 0) and on version upgrades
-        try {
-            FreeDroidWarn.showWarningOnUpgrade(this, BuildConfig.VERSION_CODE)
-        } catch (ignored: Throwable) {}
+        // Trigger FreeDroidWarn dialog after window attachment to prevent BadTokenException
+        window.decorView.post {
+            if (!isFinishing && !isDestroyed) {
+                try {
+                    FreeDroidWarn.showWarningOnUpgrade(this@MainActivity, BuildConfig.VERSION_CODE)
+                } catch (ignored: Throwable) {}
+            }
+        }
     }
 
     override fun onResume() {
@@ -122,7 +127,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun syncWithPreferences() {
-        boostPercentState.intValue = prefs.getBoostPercent()
+        runOnUiThread {
+            try {
+                boostPercentState.intValue = if (prefs.isBoostActive()) prefs.getBoostPercent() else 0
+                systemVolumeState.intValue = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+            } catch (ignored: Throwable) {}
+        }
     }
 
     override fun onDestroy() {
@@ -140,9 +150,7 @@ class MainActivity : ComponentActivity() {
     fun MainScreen() {
         var boostPercent by boostPercentState
         val maxVolume = remember { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1) }
-        var systemVolume by remember {
-            mutableIntStateOf(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC))
-        }
+        var systemVolume by systemVolumeState
 
         // Automatic Crash Recovery Dialog (no permanent UI clutter)
         var showCrashDialog by remember {
@@ -281,7 +289,15 @@ class MainActivity : ComponentActivity() {
                                         Intent.ACTION_VIEW,
                                         Uri.parse("https://github.com/KG6K/Sound-Amplifier")
                                     )
-                                    startActivity(repoIntent)
+                                    try {
+                                        startActivity(repoIntent)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "No browser app found on this device",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
                                 },
                             contentAlignment = Alignment.Center
                         ) {

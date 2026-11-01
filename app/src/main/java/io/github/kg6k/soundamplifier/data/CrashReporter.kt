@@ -154,15 +154,17 @@ object CrashReporter {
      * Share crash report as text via Android share sheet.
      */
     fun shareLatestCrashLog(context: Context) {
-        val log = getLatestCrashLog(context) ?: return
-        val sendIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "Sound Amplifier Crash Report")
-            putExtra(Intent.EXTRA_TEXT, log)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        context.startActivity(Intent.createChooser(sendIntent, "Share Crash Report").apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        })
+        try {
+            val log = getLatestCrashLog(context) ?: return
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, "Sound Amplifier Crash Report")
+                putExtra(Intent.EXTRA_TEXT, log)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(Intent.createChooser(sendIntent, "Share Crash Report").apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            })
+        } catch (ignored: Throwable) {}
     }
 }

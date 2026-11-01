@@ -76,10 +76,26 @@ class VolumeBoosterService : Service() {
         }
 
         fun stopService(context: Context): Boolean {
-            val intent = Intent(context, VolumeBoosterService::class.java).apply {
-                action = ACTION_STOP
+            return try {
+                val prefs = context.getSharedPreferences("sound_amplifier_prefs", Context.MODE_PRIVATE)
+                prefs.edit()
+                    .putInt("boost_percent", 0)
+                    .putBoolean("is_boost_active", false)
+                    .apply()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    try {
+                        android.service.quicksettings.TileService.requestListeningState(
+                            context,
+                            android.content.ComponentName(context, VolumeBoosterTileService::class.java)
+                        )
+                    } catch (ignored: Throwable) {}
+                }
+                context.stopService(Intent(context, VolumeBoosterService::class.java))
+                true
+            } catch (t: Throwable) {
+                Log.e("VolumeBoosterService", "Error stopping service", t)
+                false
             }
-            return dispatchServiceIntent(context, intent)
         }
 
         private fun dispatchServiceIntent(context: Context, intent: Intent): Boolean {
@@ -211,7 +227,8 @@ class VolumeBoosterService : Service() {
                 enhancer.setTargetGain(millibels)
                 enhancer.enabled = true
             } catch (t: Throwable) {
-                Log.e(TAG, "Session $sessionId gain error: ${t.message}")
+                Log.e(TAG, "Session $sessionId gain error, evicting stale session: ${t.message}")
+                detachFromSession(sessionId)
             }
         }
     }
@@ -219,7 +236,7 @@ class VolumeBoosterService : Service() {
     private fun attachToSession(sessionId: Int, percent: Int) {
         if (percent <= 0) return
         try {
-            val millibels = (percent * 40).coerceIn(0, 4000)
+            val millibels = (percent * 60).coerceIn(0, 6000)
             val enhancer = sessionEnhancers.getOrPut(sessionId) {
                 LoudnessEnhancer(sessionId)
             }
@@ -228,6 +245,7 @@ class VolumeBoosterService : Service() {
             Log.d(TAG, "Attached LoudnessEnhancer to session $sessionId at $millibels mB")
         } catch (t: Throwable) {
             Log.e(TAG, "Failed attaching enhancer to session $sessionId: ${t.message}")
+            detachFromSession(sessionId)
         }
     }
 
@@ -354,6 +372,7 @@ class VolumeBoosterService : Service() {
             unregisterReceiver(audioSessionReceiver)
         } catch (ignored: Throwable) {}
         releaseAllEnhancers()
+        safeStopForeground()
         super.onDestroy()
     }
 
