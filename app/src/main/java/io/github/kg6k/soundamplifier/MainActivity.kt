@@ -506,7 +506,6 @@ class MainActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // 1. PRIMARY: Boost Amplification Modern Line Slider
-                // Zero switches: Slider directly drives the audio booster (0% = off, >0% = active)
                 MaterialExpressiveSlider(
                     value = boostPercent,
                     onValueChange = { newPercent ->
@@ -516,6 +515,19 @@ class MainActivity : ComponentActivity() {
                             VolumeBoosterService.setBoost(this@MainActivity, newPercent)
                         } else {
                             VolumeBoosterService.stopService(this@MainActivity)
+                        }
+                    },
+                    onToggleBoost = {
+                        if (boostPercent > 0) {
+                            prefs.setBoostPercent(boostPercent)
+                            boostPercent = 0
+                            prefs.setBoostPercent(0)
+                            VolumeBoosterService.stopService(this@MainActivity)
+                        } else {
+                            val restored = prefs.getLastBoostPercent()
+                            boostPercent = restored
+                            prefs.setBoostPercent(restored)
+                            VolumeBoosterService.setBoost(this@MainActivity, restored)
                         }
                     },
                     label = "Boost Amplification",

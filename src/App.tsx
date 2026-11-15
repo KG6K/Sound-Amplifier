@@ -6,6 +6,14 @@ export default function App() {
   // Booster State - 0% boost is default/off, >0% is active
   const BUILD_VERSION_CODE = 6;
   const [boostPercentage, setBoostPercentage] = useState<number>(0);
+  const [lastBoostPercentage, setLastBoostPercentage] = useState<number>(() => {
+    try {
+      const saved = parseInt(localStorage.getItem('last_boost_percent') || '50', 10);
+      return saved > 0 ? Math.min(100, saved) : 50;
+    } catch {
+      return 50;
+    }
+  });
   const [systemVolume, setSystemVolume] = useState<number>(80);
   const [showDonateDialog, setShowDonateDialog] = useState<boolean>(false);
   const [showFreeDroidWarn, setShowFreeDroidWarn] = useState<boolean>(() => {
@@ -47,7 +55,32 @@ export default function App() {
   const handleBoostChange = (pct: number) => {
     const clamped = Math.max(0, Math.min(100, pct));
     setBoostPercentage(clamped);
+    if (clamped > 0) {
+      setLastBoostPercentage(clamped);
+      try {
+        localStorage.setItem('last_boost_percent', String(clamped));
+      } catch {
+        // ignore storage error
+      }
+    }
     audioEngine.setBoost(clamped, clamped > 0);
+  };
+
+  const handleToggleBoost = () => {
+    if (boostPercentage > 0) {
+      setLastBoostPercentage(boostPercentage);
+      try {
+        localStorage.setItem('last_boost_percent', String(boostPercentage));
+      } catch {
+        // ignore storage error
+      }
+      setBoostPercentage(0);
+      audioEngine.setBoost(0, false);
+    } else {
+      const restored = lastBoostPercentage > 0 ? lastBoostPercentage : 50;
+      setBoostPercentage(restored);
+      audioEngine.setBoost(restored, true);
+    }
   };
 
   const isBoostActive = boostPercentage > 0;
@@ -127,6 +160,7 @@ export default function App() {
           enabled={true}
           isDark={isDark}
           onChange={handleBoostChange}
+          onToggleBoost={handleToggleBoost}
         />
 
         {/* 2. System Media Volume Line Slider */}
