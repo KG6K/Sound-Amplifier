@@ -33,14 +33,14 @@ RepoType: git
 Repo: https://github.com/KG6K/Sound-Amplifier.git
 
 Builds:
-  - versionName: 1.0.3
-    versionCode: 6
-    commit: v1.0.3
+  - versionName: 1.0.4
+    versionCode: 7
+    commit: v1.0.4
     subdir: app
     gradle:
       - assembleRelease
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.0.3
-CurrentVersionCode: 6
+CurrentVersion: 1.0.4
+CurrentVersionCode: 7
