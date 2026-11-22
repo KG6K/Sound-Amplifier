@@ -2,13 +2,14 @@
 
 An open-source, copylefted Sound Amplifier for Android.
 
-## Key Features
+## Features
 
-- **Intuitive Boost Slider**: Amplifies media volume up to +100% past normal speaker limits.
-- **Background Foreground Service**: Continues running across music streaming, podcasts, and games via `ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK`.
-- **Quick Settings Tile**: Fast one-tap toggle and real-time percentage subtitle in the notification shade via `TileService`.
-- **Dynamic Safety Limiter**: Prevents harsh clipping distortion and protects device speakers.
-- **Android 6.0+ Compatible**: Designed for `minSdk = 23` (Android 6.0 Marshmallow) through `targetSdk = 35` (Android 15).
+- **Boost Amplification Slider**: Adjusts target gain from `0%` to `100%` (up to `+60 dB`) using Android's built-in `LoudnessEnhancer` audio effect API, paired with a separate System Media Volume slider.
+- **Quick Turn On / Turn Off**: Toggle amplification from the app header while remembering the last used boost percentage.
+- **Foreground Service**: Runs as an Android `mediaPlayback` foreground service applying `LoudnessEnhancer` to global audio session `0` and media player audio sessions. Actual loudness gain and app compatibility depend on the device's audio hardware and Android implementation.
+- **Quick Settings Tile** (Android 7.0+): Toggles amplification directly from Quick Settings on Android 12+ (falling back to opening the app if restricted by the OS), opens the app on Android 7.0–11, and shows the active boost level in the tile subtitle on Android 10+.
+- **Visual High-Boost Warning**: Highlights the boost indicator in red above `60%` alongside an on-screen warning. High amplification can cause distortion and may damage speakers or hearing—use at your own risk.
+- **Android Compatibility**: Supports Android 6.0 Marshmallow (`minSdk = 23`) through Android 15 (`targetSdk = 35`).
 
 ## Built With
 

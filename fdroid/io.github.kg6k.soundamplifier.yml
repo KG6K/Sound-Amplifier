@@ -12,35 +12,36 @@ Donate: upi://pay?pa=ansariusman@ptyes&pn=MOHAMAD%20U%20ANSHARI
 AutoName: Sound Amplifier
 Summary: Open-source, copylefted Sound Amplifier and loudness booster for Android.
 Description: |-
-  Sound Amplifier is an open-source, copylefted audio loudness booster and sound
-  enhancer designed for Android.
+  Sound Amplifier is an open-source, copylefted audio loudness booster for Android.
 
-  Key Features:
-  * Intuitive Boost Slider: Amplifies media volume past normal speaker limits up
-    to +60 dB using Android's native LoudnessEnhancer audio effects engine.
-  * Background Foreground Service: Continues running smoothly across music streaming,
-    podcasts, audiobooks, and video games.
-  * Quick Settings Tile: Toggle amplification with a single tap directly from your
-    Android notification shade (Android 7.0+).
-  * Safety Limiter: Visual color transitions (green up to 60%, red above 60%) and
-    dynamic warning notices to protect your device speakers and hearing.
-  * Broad Android Compatibility: Fully supports Android 6.0 Marshmallow (API 23)
-    through Android 15 (API 35).
-  * 100% Free & Open Source: No advertisements, no trackers, and zero proprietary
-    dependencies.
+  Features:
+  * Boost & Media Volume Sliders: Adjust target gain from 0% to 100% (up to +60 dB)
+    using Android's built-in LoudnessEnhancer API alongside a system media volume slider.
+  * Quick Turn On / Turn Off: Pause or restore your last boost percentage with one tap
+    from the app header or ongoing notification.
+  * Foreground Service: Applies LoudnessEnhancer to global audio session 0 and media
+    player audio sessions (actual loudness gain and app compatibility depend on the
+    device and Android implementation).
+  * Quick Settings Tile (Android 7.0+): Toggles amplification directly on Android 12+
+    (opens the app on Android 7.0–11) and displays the active level in the subtitle
+    on Android 10+.
+  * Visual High-Boost Warning: Highlights the boost indicator in red above 60% with
+    an on-screen warning about speaker and hearing risks.
+  * Broad Android Compatibility: Supports Android 6.0 Marshmallow (API 23) through
+    Android 15 (API 35) with no ads or trackers.
 
 RepoType: git
 Repo: https://github.com/KG6K/Sound-Amplifier.git
 
 Builds:
-  - versionName: 1.0.4
-    versionCode: 7
-    commit: v1.0.4
+  - versionName: 1.0.5
+    versionCode: 8
+    commit: v1.0.5
     subdir: app
     gradle:
       - assembleRelease
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.0.4
-CurrentVersionCode: 7
+CurrentVersion: 1.0.5
+CurrentVersionCode: 8

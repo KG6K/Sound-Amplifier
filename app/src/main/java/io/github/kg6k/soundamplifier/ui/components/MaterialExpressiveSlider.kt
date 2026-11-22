@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kg6k.soundamplifier.ui.theme.*
+import kotlin.math.roundToInt
 
 /**
  * Sleek modern line slider with round elevated thumb,
@@ -128,6 +129,12 @@ fun MaterialExpressiveSlider(
             }
 
             // Sleek Modern Line Slider Track & Round Thumb
+            val currentValue by rememberUpdatedState(value)
+            val currentOnValueChange by rememberUpdatedState(onValueChange)
+            val currentMin by rememberUpdatedState(min)
+            val currentMax by rememberUpdatedState(max)
+            val currentStep by rememberUpdatedState(step)
+
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -135,20 +142,30 @@ fun MaterialExpressiveSlider(
                     .pointerInput(enabled) {
                         if (!enabled) return@pointerInput
                         detectTapGestures { offset ->
+                            if (size.width <= 0) return@detectTapGestures
                             val fraction = (offset.x / size.width).coerceIn(0f, 1f)
-                            val rawVal = min + (fraction * (max - min)).toInt()
-                            val stepped = Math.round(rawVal.toFloat() / step) * step
-                            onValueChange(stepped.coerceIn(min, max))
+                            val rawVal = currentMin + (fraction * (currentMax - currentMin))
+                            val safeStep = currentStep.coerceAtLeast(1)
+                            val stepped = (rawVal / safeStep).roundToInt() * safeStep
+                            val clamped = stepped.coerceIn(currentMin, currentMax)
+                            if (clamped != currentValue) {
+                                currentOnValueChange(clamped)
+                            }
                         }
                     }
                     .pointerInput(enabled) {
                         if (!enabled) return@pointerInput
                         detectDragGestures { change, _ ->
                             change.consume()
+                            if (size.width <= 0) return@detectDragGestures
                             val fraction = (change.position.x / size.width).coerceIn(0f, 1f)
-                            val rawVal = min + (fraction * (max - min)).toInt()
-                            val stepped = Math.round(rawVal.toFloat() / step) * step
-                            onValueChange(stepped.coerceIn(min, max))
+                            val rawVal = currentMin + (fraction * (currentMax - currentMin))
+                            val safeStep = currentStep.coerceAtLeast(1)
+                            val stepped = (rawVal / safeStep).roundToInt() * safeStep
+                            val clamped = stepped.coerceIn(currentMin, currentMax)
+                            if (clamped != currentValue) {
+                                currentOnValueChange(clamped)
+                            }
                         }
                     },
                 contentAlignment = Alignment.CenterStart

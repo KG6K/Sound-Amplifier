@@ -1,12 +1,12 @@
-Sound Amplifier is an open-source, copylefted audio loudness booster and sound enhancer designed for Android.
+Sound Amplifier is an open-source, copylefted audio loudness booster for Android.
 
-Key Features:
-• Intuitive Boost Slider: Amplifies media volume past normal speaker limits up to +60 dB using Android's native LoudnessEnhancer audio effects engine.
-• Background Foreground Service: Continues running smoothly across music streaming, podcasts, audiobooks, and video games.
-• Quick Settings Tile: Toggle amplification with a single tap directly from your Android notification shade (Android 7.0+).
-• Safety Limiter: Visual color transitions (green up to 60%, red above 60%) and dynamic warning notices to protect your device speakers and hearing.
-• Broad Android Compatibility: Fully supports Android 6.0 Marshmallow (API 23) through Android 15 (API 35).
-• 100% Free & Open Source: No advertisements, no trackers, no in-app purchases, and zero proprietary dependencies.
+Features:
+• Boost & Media Volume Sliders: Adjust target gain from 0% to 100% (up to +60 dB) using Android's built-in LoudnessEnhancer API alongside a system media volume slider.
+• Quick Turn On / Turn Off: Pause or restore your last boost level with one tap in the header or notification.
+• Foreground Service: Applies LoudnessEnhancer to global audio session 0 and media player sessions while running in the background (actual gain and app compatibility vary by device and Android version).
+• Quick Settings Tile (Android 7.0+): Toggles amplification directly on Android 12+ (opening the app on Android 7.0–11) and displays the active level in the subtitle on Android 10+.
+• Visual High-Boost Warning: Switches the boost indicator to red above 60% with an on-screen caution notice. High volumes can distort audio or damage speakers and hearing.
+• Android 6.0 to 15 Support: Built for API 23 through API 35 with no ads, no trackers, and GPL-3.0 licensing.
 
 Source code and issues:
 https://github.com/KG6K/Sound-Amplifier

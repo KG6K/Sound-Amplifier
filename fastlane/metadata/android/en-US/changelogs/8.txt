@@ -1,0 +1,4 @@
+- UI refresh: borderless slider cards, value badges, and Support Development dialog with tonal GitHub button.
+- Moved Turn Off / Turn On toggle to the top-right header with dynamic Purple Primary (active) and Neutral Grey (idle) state colors; tapping the app logo now opens the Support Development dialog.
+- Runtime fixes: deduplicated slider drag updates to prevent foreground service/notification flooding, added LoudnessEnhancer error recovery, fixed system volume rounding, and improved service lifecycle handling.
+- Updated README and store metadata for strict factual accuracy.

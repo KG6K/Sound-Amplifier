@@ -40,6 +40,7 @@ import io.github.kg6k.soundamplifier.data.CrashReporter
 import io.github.kg6k.soundamplifier.ui.components.MaterialExpressiveSlider
 import io.github.kg6k.soundamplifier.ui.theme.*
 import org.woheller69.freeDroidWarn.FreeDroidWarn
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
 
@@ -501,9 +502,16 @@ class MainActivity : ComponentActivity() {
                                     VolumeBoosterService.stopService(this@MainActivity)
                                 } else {
                                     val restored = prefs.getLastBoostPercent()
-                                    boostPercent = restored
-                                    prefs.setBoostPercent(restored)
-                                    VolumeBoosterService.setBoost(this@MainActivity, restored)
+                                    if (VolumeBoosterService.setBoost(this@MainActivity, restored)) {
+                                        boostPercent = restored
+                                        prefs.setBoostPercent(restored)
+                                    } else {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "Unable to start audio service",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
                         ) {
@@ -550,11 +558,11 @@ class MainActivity : ComponentActivity() {
                 )
 
                 // 2. Standard System Media Volume Line Slider
-                val systemVolumePercent = ((systemVolume.toFloat() / maxVolume) * 100).toInt()
+                val systemVolumePercent = ((systemVolume.toFloat() / maxVolume) * 100f).roundToInt().coerceIn(0, 100)
                 MaterialExpressiveSlider(
                     value = systemVolumePercent,
                     onValueChange = { newPct ->
-                        val newVol = ((newPct / 100f) * maxVolume).toInt().coerceIn(0, maxVolume)
+                        val newVol = ((newPct / 100f) * maxVolume).roundToInt().coerceIn(0, maxVolume)
                         systemVolume = newVol
                         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVol, 0)
                     },

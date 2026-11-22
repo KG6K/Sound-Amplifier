@@ -29,11 +29,26 @@ jobs:
       - name: Build Android APK with R8 Shrinking
         run: ./gradlew assembleRelease --stacktrace
 
-      - name: Prepare APK for Release
+      - name: Prepare APK and Release Notes
         run: |
           mkdir -p release-output
-          TAG_NAME="${GITHUB_REF_NAME:-v1.0.4}"
+          TAG_NAME="${GITHUB_REF_NAME:-v1.0.5}"
+          VERSION_CODE="$(grep -E 'versionCode\s*=' app/build.gradle.kts | head -n 1 | grep -oE '[0-9]+')"
           cp app/build/outputs/apk/release/*.apk "release-output/SoundAmplifier-${TAG_NAME}.apk"
+          CHANGELOG_FILE="fastlane/metadata/android/en-US/changelogs/${VERSION_CODE}.txt"
+          {
+            echo "## Sound Amplifier ${TAG_NAME}"
+            echo ""
+            echo "### Download"
+            echo "- **\`SoundAmplifier-${TAG_NAME}.apk\`**: Signed Android release APK (Android 6.0 / API 23 through Android 15 / API 35)."
+            echo ""
+            echo "### Changes in ${TAG_NAME}"
+            if [ -f "${CHANGELOG_FILE}" ]; then
+              cat "${CHANGELOG_FILE}"
+            else
+              echo "- Maintenance release ${TAG_NAME} (versionCode ${VERSION_CODE})."
+            fi
+          } > release-output/release_notes.md
           ls -la release-output/
 
       - name: Upload APK Artifacts
@@ -49,20 +64,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Sound Amplifier ${{ github.ref_name }}
-          body: |
-            ## Sound Amplifier ${{ github.ref_name }} — Official Stable Release
-
-            ### Download:
-            - **`SoundAmplifier-${{ github.ref_name }}.apk`**: Official signed Android APK release (compatible with Android 6.0 Marshmallow through Android 15).
-
-            ### Highlights & Key Features:
-            - **Native Audio Loudness Boost**: Enhances media volume up to +60 dB using Android's native `LoudnessEnhancer` audio effects engine across all music, podcasts, and video players.
-            - **Android 6.0 to 15 Compatibility**: Backward-compatible with Android 6.0 Marshmallow (`minSdk = 23`) through Android 15 (`targetSdk = 35`).
-            - **Quick Settings Tile**: Fast one-tap toggle with real-time amplification status in the notification shade (Android 7.0+).
-            - **Visual Safety Limiter**: Dynamic slider color transitions (emerald green $\le$ 60%, bright red $>$ 60%) to prevent hearing damage and speaker blowouts.
-            - **Permanent Release Signature**: Signed with official keystore certificate for seamless future app updates.
-            - **100% Free & Open Source**: Licensed under GNU General Public License v3.0 (GPL-3.0), zero trackers, zero ads, and zero proprietary blobs.
-            - **F-Droid Ready**: Complete Fastlane metadata and F-Droid build recipe included.
+          body_path: release-output/release_notes.md
           files: release-output/*.apk
           draft: false
           prerelease: false

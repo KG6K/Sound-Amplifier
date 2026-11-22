@@ -16,12 +16,20 @@ export class AudioEngine {
   private isLimiterEnabled: boolean = true;
 
   private initContext() {
+    if (typeof window === 'undefined') return;
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      try {
+        this.ctx = new AudioCtx();
+      } catch {
+        return;
+      }
     }
     if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {
+        // Ignore browser autoplay policy rejection before user gesture
+      });
     }
 
     if (!this.masterGain) {

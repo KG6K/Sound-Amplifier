@@ -18,12 +18,13 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * High-performance Foreground Audio Amplification Service
- * Delivers real audible volume enhancement (up to +40 dB / 4000 mB)
- * with dynamic session hooking across third-party media players (YouTube, Spotify, etc.)
+ * Foreground Audio Amplification Service
+ * Applies target gain up to +60 dB (6000 mB) via Android's LoudnessEnhancer
+ * on global session 0 and active media player sessions.
  */
 class VolumeBoosterService : Service() {
 
@@ -141,24 +142,23 @@ class VolumeBoosterService : Service() {
         // Always satisfy Android foreground service contract immediately
         safeStartForeground(savedPercent)
 
+        var finalPercent = savedPercent
         when (action) {
             ACTION_SET_PERCENT -> {
-                val newPct = intent?.getIntExtra(EXTRA_PERCENT, savedPercent) ?: savedPercent
-                applyAndSaveBoost(newPct)
+                finalPercent = (intent?.getIntExtra(EXTRA_PERCENT, savedPercent) ?: savedPercent).coerceIn(0, 100)
+                applyAndSaveBoost(finalPercent)
             }
             ACTION_STEP_BOOST -> {
                 val step = intent?.getIntExtra(EXTRA_STEP, 0) ?: 0
-                val newPct = (currentBoostPercent + step).coerceIn(0, 100)
-                applyAndSaveBoost(newPct)
+                finalPercent = (currentBoostPercent + step).coerceIn(0, 100)
+                applyAndSaveBoost(finalPercent)
             }
             ACTION_STOP -> {
+                finalPercent = 0
                 applyAndSaveBoost(0)
-                releaseAllEnhancers()
-                safeStopForeground()
-                stopSelf()
             }
         }
-        return START_STICKY
+        return if (finalPercent > 0) START_STICKY else START_NOT_STICKY
     }
 
     private fun applyAndSaveBoost(percent: Int) {
@@ -201,7 +201,7 @@ class VolumeBoosterService : Service() {
     private fun applyLoudnessGain(percent: Int) {
         val millibels = (percent * 60).coerceIn(0, 6000)
 
-        // 1. Apply to global session 0
+        // 1. Apply to global session 0 (recreate cleanly if audio server invalidated previous instance)
         try {
             if (globalEnhancer == null) {
                 globalEnhancer = LoudnessEnhancer(0)
@@ -209,19 +209,16 @@ class VolumeBoosterService : Service() {
             globalEnhancer?.setTargetGain(millibels)
             globalEnhancer?.enabled = true
         } catch (t: Throwable) {
-            Log.e(TAG, "Global LoudnessEnhancer error: ${t.message}")
+            Log.e(TAG, "Global LoudnessEnhancer error, resetting instance: ${t.message}")
+            try {
+                globalEnhancer?.enabled = false
+                globalEnhancer?.release()
+            } catch (ignored: Throwable) {} finally {
+                globalEnhancer = null
+            }
         }
 
-        // 2. Broadcast effect session announcement so system audio policy routes to enhancer
-        try {
-            val intent = Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
-                putExtra(AudioEffect.EXTRA_AUDIO_SESSION, 0)
-                putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
-            }
-            sendBroadcast(intent)
-        } catch (ignored: Throwable) {}
-
-        // 3. Apply to all actively tracked third-party player sessions
+        // 2. Apply to all actively tracked third-party player sessions
         sessionEnhancers.forEach { (sessionId, enhancer) ->
             try {
                 enhancer.setTargetGain(millibels)
@@ -333,7 +330,7 @@ class VolumeBoosterService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val dbGain = String.format("+%.1f dB", (percent * 60) / 100f)
+        val dbGain = String.format(Locale.US, "+%.1f dB", (percent * 60) / 100f)
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Sound Amplifier: +$percent% ($dbGain)")

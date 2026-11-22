@@ -52,7 +52,7 @@ object CrashReporter {
 
         val prefs = context.getSharedPreferences("sound_amplifier_prefs", Context.MODE_PRIVATE)
         val isBoostActive = prefs.getBoolean("is_boost_active", false)
-        val boostPercent = prefs.getInt("boost_percent", 50)
+        val boostPercent = prefs.getInt("boost_percent", 0)
 
         val reportContent = buildString {
             appendLine("==========================================")
@@ -67,7 +67,7 @@ object CrashReporter {
                 }
                 "${pInfo.versionName} (${androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(pInfo)})"
             } catch (_: Throwable) {
-                "1.0.0-alpha2 (3)"
+                "${io.github.kg6k.soundamplifier.BuildConfig.VERSION_NAME} (${io.github.kg6k.soundamplifier.BuildConfig.VERSION_CODE})"
             }
             appendLine("App Version     : $versionStr")
             appendLine("Device Model    : ${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE})")
