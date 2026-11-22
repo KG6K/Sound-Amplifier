@@ -97,16 +97,22 @@ export default function App() {
       style={{ backgroundColor: bgColor }}
     >
       <div className="w-full max-w-md space-y-3">
-        {/* App Header Bar with App Icon, Title, Active dB, and Donate Button in Top Right Corner */}
+        {/* App Header Bar with Clickable App Icon (Donate), Title, Active dB, and Turn Off/On Tonal Pill */}
         <div className="flex items-center justify-between py-2 px-1">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-xs shrink-0 bg-[#0c0a14] border border-[#6834cd]/50">
+            <button
+              type="button"
+              onClick={() => setShowDonateDialog(true)}
+              title="Support Development"
+              aria-label="Support Development"
+              className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-xs shrink-0 bg-[#0c0a14] border border-[#6834cd]/50 cursor-pointer transition-transform duration-150 active:scale-95"
+            >
               <img
                 src="/app_icon.svg"
                 alt="Sound Amplifier Icon"
                 className="w-full h-full object-contain"
               />
-            </div>
+            </button>
             <div>
               <h1
                 className="text-lg font-bold tracking-tight leading-tight"
@@ -132,18 +138,29 @@ export default function App() {
             </div>
           </div>
 
-          {/* Donate in top right corner */}
+          {/* Turn Off / Turn On pill in top right corner (Purple Primary active vs Neutral Grey idle) */}
           <button
             type="button"
-            onClick={() => setShowDonateDialog(true)}
-            className="flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 active:scale-95 cursor-pointer shrink-0"
+            onClick={handleToggleBoost}
+            className="flex items-center justify-center px-3 h-8 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 active:scale-95 cursor-pointer shrink-0"
             style={{
-              backgroundColor: isDark ? '#4A4458' : '#EDE7F6',
-              color: isDark ? '#E8DEF8' : '#5E35B1',
+              backgroundColor: isBoostActive
+                ? isDark
+                  ? '#D0BCFF'
+                  : '#6750A4'
+                : isDark
+                  ? '#2B2930'
+                  : '#E2E8F0',
+              color: isBoostActive
+                ? isDark
+                  ? '#381E72'
+                  : '#FFFFFF'
+                : isDark
+                  ? '#CAC4D0'
+                  : '#475569',
             }}
           >
-            <span className="text-xs">❤️</span>
-            <span>Donate</span>
+            <span>{isBoostActive ? 'Turn Off' : 'Turn On'}</span>
           </button>
         </div>
 
@@ -160,7 +177,6 @@ export default function App() {
           enabled={true}
           isDark={isDark}
           onChange={handleBoostChange}
-          onToggleBoost={handleToggleBoost}
         />
 
         {/* 2. System Media Volume Line Slider */}
@@ -198,7 +214,6 @@ export default function App() {
             className="w-full max-w-[300px] rounded-[22px] px-[18px] pt-[14px] pb-[10px] shadow-2xl transition-all"
             style={{
               backgroundColor: isDark ? '#2B2930' : '#ECE6F0',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.08)',
               color: isDark ? '#E6E1E5' : '#1D1B20',
             }}
           >
@@ -235,16 +250,15 @@ export default function App() {
                 <span>⚡ Donate by UPI</span>
               </a>
 
-              {/* Material 3 Outlined Box (36px) */}
+              {/* Material 3 Tonal Filled Box (36px, borderless) */}
               <a
                 href="https://github.com/KG6K/Sound-Amplifier"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full h-9 flex items-center justify-center gap-1.5 rounded-[10px] text-xs font-semibold transition active:scale-98 cursor-pointer text-center select-none"
                 style={{
-                  backgroundColor: 'transparent',
-                  border: isDark ? '1px solid #938F99' : '1px solid #79747E',
-                  color: isDark ? '#D0BCFF' : '#6750A4',
+                  backgroundColor: isDark ? '#4A4458' : '#EDE7F6',
+                  color: isDark ? '#E8DEF8' : '#5E35B1',
                 }}
               >
                 <span>GitHub Repository</span>

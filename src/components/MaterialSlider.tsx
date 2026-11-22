@@ -14,7 +14,6 @@ interface MaterialSliderProps {
   enabled?: boolean;
   isDark?: boolean;
   onChange: (val: number) => void;
-  onToggleBoost?: () => void;
   ticks?: number[];
   onDangerousThreshold?: () => void;
 }
@@ -33,7 +32,6 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
   enabled = true,
   isDark = true,
   onChange,
-  onToggleBoost,
   ticks = [],
   onDangerousThreshold,
 }) => {
@@ -117,7 +115,6 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
   }, [isDragging, handlePointer]);
 
   const cardBg = isDark ? '#211F26' : '#FFFFFF';
-  const cardBorder = isDark ? '#33303D' : '#E2E8F0';
   const trackInactive = isDark ? '#262A36' : '#E2E8F0';
   const textTitle = isDark ? '#E6E1E5' : '#0F172A';
   const textSub = isDark ? '#938F99' : '#64748B';
@@ -131,7 +128,6 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
       }`}
       style={{
         backgroundColor: cardBg,
-        border: `1px solid ${cardBorder}`,
         boxShadow: isDark ? 'none' : '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
       }}
     >
@@ -146,52 +142,19 @@ export const MaterialSlider: React.FC<MaterialSliderProps> = ({
           </span>
         </div>
 
-        {/* Right Controls: Turn Off/On Toggle Button + Fixed-dimension Value Display */}
-        <div className="flex items-center gap-2 shrink-0">
-          {isBoostMode && onToggleBoost && (
-            <button
-              type="button"
-              onClick={onToggleBoost}
-              className="h-6 px-2.5 rounded-lg flex items-center justify-center text-xs font-semibold border transition-all duration-150 active:scale-95 cursor-pointer select-none"
-              style={{
-                backgroundColor:
-                  value > 0
-                    ? isDark
-                      ? 'rgba(239, 68, 68, 0.14)'
-                      : '#FEE2E2'
-                    : isDark
-                      ? 'rgba(16, 185, 129, 0.14)'
-                      : '#D1FAE5',
-                borderColor:
-                  value > 0
-                    ? isDark
-                      ? 'rgba(239, 68, 68, 0.45)'
-                      : '#FCA5A5'
-                    : isDark
-                      ? 'rgba(16, 185, 129, 0.45)'
-                      : '#6EE7B7',
-                color: value > 0 ? '#EF4444' : '#10B981',
-              }}
-            >
-              {value > 0 ? 'Turn Off' : 'Turn On'}
-            </button>
-          )}
-
-          {/* Fixed-dimension Stable Value Display (56px x 24px) */}
-          <div
-            className="w-14 h-6 px-1 rounded-lg flex items-center justify-center font-mono border tabular-nums shrink-0 transition-colors duration-150"
-            style={{
-              backgroundColor: isBoostMode && value > 60 ? (isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2') : `${trackColor}26`,
-              borderColor: isBoostMode && value > 60 ? 'rgba(239, 68, 68, 0.4)' : `${trackColor}40`,
-              color: isBoostMode && value > 60 ? '#EF4444' : trackColor,
-            }}
-          >
-            <span className="text-sm font-bold text-center inline-flex items-baseline">
-              {prefix}
-              {value}
-              <span className="text-[10px] font-bold ml-0.5">{unit}</span>
-            </span>
-          </div>
+        {/* Fixed-dimension Stable Value Display (56px x 24px) */}
+        <div
+          className="w-14 h-6 px-1 rounded-lg flex items-center justify-center font-mono tabular-nums shrink-0 transition-colors duration-150"
+          style={{
+            backgroundColor: isBoostMode && value > 60 ? (isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2') : `${trackColor}26`,
+            color: isBoostMode && value > 60 ? '#EF4444' : trackColor,
+          }}
+        >
+          <span className="text-sm font-bold text-center inline-flex items-baseline">
+            {prefix}
+            {value}
+            <span className="text-[10px] font-bold ml-0.5">{unit}</span>
+          </span>
         </div>
       </div>
 

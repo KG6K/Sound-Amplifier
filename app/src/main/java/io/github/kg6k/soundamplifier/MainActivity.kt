@@ -10,9 +10,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -209,11 +209,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(22.dp),
-                    color = if (isDark) Color(0xFF2B2930) else Color(0xFFECE6F0),
-                    border = androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
-                    )
+                    color = if (isDark) Color(0xFF2B2930) else Color(0xFFECE6F0)
                 ) {
                     Column(
                         modifier = Modifier
@@ -277,13 +273,13 @@ class MainActivity : ComponentActivity() {
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        // GitHub Source Code Repo Button (36dp height without M3 48dp minimum touch target bloat)
+                        // GitHub Source Code Repo Button (36dp borderless M3 tonal fill)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(36.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
                                 .clickable {
                                     val repoIntent = Intent(
                                         Intent.ACTION_VIEW,
@@ -305,7 +301,7 @@ class MainActivity : ComponentActivity() {
                                 text = "GitHub Repository",
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
 
@@ -351,7 +347,10 @@ class MainActivity : ComponentActivity() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            modifier = Modifier.size(40.dp),
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { showDonateDialog = true },
                             shape = RoundedCornerShape(12.dp),
                             color = Color(0xFF0C0A14),
                             border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF6834CD).copy(alpha = 0.5f))
@@ -468,28 +467,55 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))
+                        val isDarkTheme = isSystemInDarkTheme()
+                        val isBoostOn = boostPercent > 0
+                        val toggleBgColor by animateColorAsState(
+                            targetValue = if (isBoostOn) {
+                                MaterialTheme.colorScheme.primary
+                            } else if (isDarkTheme) {
+                                Color(0xFF2B2930)
+                            } else {
+                                Color(0xFFE2E8F0)
+                            },
+                            label = "toggle_bg"
+                        )
+                        val toggleTextColor by animateColorAsState(
+                            targetValue = if (isBoostOn) {
+                                MaterialTheme.colorScheme.onPrimary
+                            } else if (isDarkTheme) {
+                                Color(0xFFCAC4D0)
+                            } else {
+                                Color(0xFF475569)
+                            },
+                            label = "toggle_text"
+                        )
                         Surface(
                             shape = RoundedCornerShape(20.dp),
-                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            color = toggleBgColor,
                             modifier = Modifier.height(32.dp),
                             onClick = {
-                                showDonateDialog = true
+                                if (boostPercent > 0) {
+                                    prefs.setBoostPercent(boostPercent)
+                                    boostPercent = 0
+                                    prefs.setBoostPercent(0)
+                                    VolumeBoosterService.stopService(this@MainActivity)
+                                } else {
+                                    val restored = prefs.getLastBoostPercent()
+                                    boostPercent = restored
+                                    prefs.setBoostPercent(restored)
+                                    VolumeBoosterService.setBoost(this@MainActivity, restored)
+                                }
                             }
                         ) {
-                            Row(
+                            Box(
                                 modifier = Modifier.padding(horizontal = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "❤️",
-                                    fontSize = 12.sp
-                                )
-                                Text(
-                                    text = "Donate",
+                                    text = if (isBoostOn) "Turn Off" else "Turn On",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    color = toggleTextColor
                                 )
                             }
                         }
@@ -515,19 +541,6 @@ class MainActivity : ComponentActivity() {
                             VolumeBoosterService.setBoost(this@MainActivity, newPercent)
                         } else {
                             VolumeBoosterService.stopService(this@MainActivity)
-                        }
-                    },
-                    onToggleBoost = {
-                        if (boostPercent > 0) {
-                            prefs.setBoostPercent(boostPercent)
-                            boostPercent = 0
-                            prefs.setBoostPercent(0)
-                            VolumeBoosterService.stopService(this@MainActivity)
-                        } else {
-                            val restored = prefs.getLastBoostPercent()
-                            boostPercent = restored
-                            prefs.setBoostPercent(restored)
-                            VolumeBoosterService.setBoost(this@MainActivity, restored)
                         }
                     },
                     label = "Boost Amplification",

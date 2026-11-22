@@ -44,8 +44,7 @@ fun MaterialExpressiveSlider(
     enabled: Boolean = true,
     prefix: String = if (isBoostMode) "+" else "",
     unit: String = "%",
-    presets: List<Int> = emptyList(),
-    onToggleBoost: (() -> Unit)? = null
+    presets: List<Int> = emptyList()
 ) {
     val isDark = isSystemInDarkTheme()
     val colorScheme = MaterialTheme.colorScheme
@@ -64,11 +63,10 @@ fun MaterialExpressiveSlider(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, colorScheme.outline)
+        color = colorScheme.surface
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            // Header Row: Label, Turn Off/On Toggle Button, and Tabular Value Display
+            // Header Row: Label and Tabular Value Display
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -83,62 +81,34 @@ fun MaterialExpressiveSlider(
                     modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                // Fixed-dimension Stable Value Display (Does not jitter or resize)
+                Surface(
+                    modifier = Modifier.width(56.dp).height(24.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    color = trackColor.copy(alpha = 0.15f)
                 ) {
-                    if (isBoostMode && onToggleBoost != null) {
-                        val isActive = value > 0
-                        val btnColor = if (isActive) RedDanger else EmeraldSafe
-                        Box(
-                            modifier = Modifier
-                                .height(24.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(btnColor.copy(alpha = 0.14f))
-                                .border(1.dp, btnColor.copy(alpha = 0.45f), RoundedCornerShape(8.dp))
-                                .clickable { onToggleBoost() }
-                                .padding(horizontal = 10.dp),
-                            contentAlignment = Alignment.Center
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = if (isActive) "Turn Off" else "Turn On",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = btnColor
+                                text = "$prefix$value",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                color = trackColor
                             )
-                        }
-                    }
-
-                    // Fixed-dimension Stable Value Display (Does not jitter or resize)
-                    Surface(
-                        modifier = Modifier.width(56.dp).height(24.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        color = trackColor.copy(alpha = 0.15f),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, trackColor.copy(alpha = 0.4f))
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.Bottom,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "$prefix$value",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = FontFamily.Monospace,
-                                    color = trackColor
-                                )
-                                Text(
-                                    text = unit,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = trackColor,
-                                    modifier = Modifier.padding(bottom = 1.dp, start = 1.dp)
-                                )
-                            }
+                            Text(
+                                text = unit,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = trackColor,
+                                modifier = Modifier.padding(bottom = 1.dp, start = 1.dp)
+                            )
                         }
                     }
                 }
